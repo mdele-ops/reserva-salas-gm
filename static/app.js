@@ -23,7 +23,6 @@ const ROOM_STORAGE_KEY = 'salas.lastRoomEmail';
 
 let guests = []; // { email, name }
 let selectedRoom = config.rooms[0];
-let userTouchedForm = false;
 let lastAddedGuest = null;
 let hasRendered = false;
 let directory = [];
@@ -37,11 +36,6 @@ const roomTitle    = document.getElementById('room-title');
 const roomSelect   = document.getElementById('room-select');
 const roomNote     = document.getElementById('room-note');
 const subjectInput = document.getElementById('subject-input');
-const dateInput    = document.getElementById('date-input');
-const startInput   = document.getElementById('start-input');
-const endInput     = document.getElementById('end-input');
-const tzNote       = document.getElementById('tz-note');
-const scheduleMsg  = document.getElementById('schedule-msg');
 const pillRow      = document.getElementById('pill-row');
 const emailInput     = document.getElementById('email-input');
 const suggestionsEl  = document.getElementById('guest-suggestions');
@@ -113,66 +107,6 @@ function selectRoom(email) {
   storeRoom(room.email);
   showError('');
   render();
-}
-
-/* ── Fecha / hora ───────────────────────────────────── */
-const pad = (n) => String(n).padStart(2, '0');
-const toDateValue = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-const toTimeValue = (d) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
-
-function roundUpToQuarter(date) {
-  const d = new Date(date);
-  d.setSeconds(0, 0);
-  d.setMinutes(Math.ceil(d.getMinutes() / 15) * 15);
-  return d;
-}
-
-function addMinutes(date, minutes) {
-  return new Date(date.getTime() + minutes * 60000);
-}
-
-/** Combina los inputs de fecha y hora locales en un Date, o null si están incompletos. */
-function readLocalDateTime(timeValue) {
-  if (!dateInput.value || !timeValue) return null;
-  const dt = new Date(`${dateInput.value}T${timeValue}`);
-  return Number.isNaN(dt.getTime()) ? null : dt;
-}
-
-/**
- * Sin la 'Z' final, Outlook lee la hora en la zona horaria del perfil del
- * usuario. Como quien reserva y la sala están en el mismo sitio, mandar la
- * hora tal cual se escribió evita conversiones y el bug de Outlook móvil
- * al interpretar offsets UTC.
- */
-function toOutlookLocal(date) {
-  return `${toDateValue(date)}T${toTimeValue(date)}:00`;
-}
-
-function applyDefaultSchedule() {
-  const start = roundUpToQuarter(addMinutes(new Date(), 5));
-  const end = addMinutes(start, config.defaultDurationMin);
-
-  dateInput.value = toDateValue(start);
-  startInput.value = toTimeValue(start);
-  endInput.value = toTimeValue(end);
-  dateInput.min = toDateValue(new Date());
-
-  try {
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    tzNote.textContent = `Horario local (${tz}), según la zona horaria de tu Outlook.`;
-  } catch {
-    tzNote.textContent = 'El horario se envía en tu hora local.';
-  }
-}
-
-/* Al mover el inicio, se recorre el fin para que nunca quede antes. */
-function syncEndTime() {
-  const start = readLocalDateTime(startInput.value);
-  const end = readLocalDateTime(endInput.value);
-  if (!start) return;
-  if (!end || end <= start) {
-    endInput.value = toTimeValue(addMinutes(start, config.defaultDurationMin));
-  }
 }
 
 /* ── Directorio ─────────────────────────────────────── */
@@ -544,16 +478,6 @@ function setMessage(el, msg) {
 
 /* ── Deeplink de Outlook ────────────────────────────── */
 function buildOutlookUrl() {
-  const start = readLocalDateTime(startInput.value);
-  const end = readLocalDateTime(endInput.value);
-
-  if (!start || !end) {
-    return { url: null, error: 'Completa la fecha, la hora de inicio y la de fin.' };
-  }
-  if (end <= start) {
-    return { url: null, error: 'La hora de fin debe ser posterior a la de inicio.' };
-  }
-
   const subject = subjectInput.value.trim() || `Reunión — ${selectedRoom.name}`;
   const attendees = [selectedRoom.email, ...guestEmails()].join(',');
 
@@ -561,36 +485,25 @@ function buildOutlookUrl() {
     path: '/calendar/action/compose',
     rru: 'addevent',
     subject,
-    startdt: toOutlookLocal(start),
-    enddt: toOutlookLocal(end),
     location: selectedRoom.name,
     to: attendees,
     allday: 'false',
   });
 
-  return { url: `${OUTLOOK_COMPOSE_URL}?${params.toString()}`, error: '' };
+  return `${OUTLOOK_COMPOSE_URL}?${params.toString()}`;
 }
 
 function updateOutlookLink() {
-  const { url, error } = buildOutlookUrl();
-
-  if (url) {
-    openBtn.href = url;
-    openBtn.removeAttribute('aria-disabled');
-    copyBtn.removeAttribute('aria-disabled');
-  } else {
-    openBtn.removeAttribute('href');
-    openBtn.setAttribute('aria-disabled', 'true');
-    copyBtn.setAttribute('aria-disabled', 'true');
-  }
-
-  setMessage(scheduleMsg, error);
+  const url = buildOutlookUrl();
+  openBtn.href = url;
+  openBtn.removeAttribute('aria-disabled');
+  copyBtn.removeAttribute('aria-disabled');
   resetCopyLabel();
   return url;
 }
 
 async function copyLink() {
-  const { url } = buildOutlookUrl();
+  const url = buildOutlookUrl();
   if (!url) return;
 
   try {
@@ -628,7 +541,6 @@ async function loadConfig() {
 
     renderRoomOptions();
     emailInput.placeholder = `Nombre o usuario@${config.allowedDomain}`;
-    if (!userTouchedForm) applyDefaultSchedule();
   } catch {
     // La página funciona con los valores por defecto si el API no responde.
   }
@@ -636,11 +548,6 @@ async function loadConfig() {
 
 /* ── Listeners ──────────────────────────────────────── */
 form.addEventListener('submit', (e) => e.preventDefault());
-
-/* Cambiar de sala no cuenta como editar el horario, que sigue autollenándose. */
-form.addEventListener('input', (e) => {
-  if (e.target !== roomSelect) userTouchedForm = true;
-});
 
 roomSelect.addEventListener('change', () => selectRoom(roomSelect.value));
 
@@ -653,21 +560,13 @@ emailInput.addEventListener('blur', () => {
   setTimeout(hideSuggestions, 120);
 });
 
-startInput.addEventListener('change', () => {
-  syncEndTime();
-  updateOutlookLink();
-});
-
-[subjectInput, dateInput, endInput].forEach((el) => {
-  el.addEventListener('input', updateOutlookLink);
-  el.addEventListener('change', updateOutlookLink);
-});
+subjectInput.addEventListener('input', updateOutlookLink);
+subjectInput.addEventListener('change', updateOutlookLink);
 
 copyBtn.addEventListener('click', copyLink);
 
 /* ── Init ───────────────────────────────────────────── */
 renderRoomOptions();
-applyDefaultSchedule();
 render();
 loadDirectory();
 loadConfig().then(render);

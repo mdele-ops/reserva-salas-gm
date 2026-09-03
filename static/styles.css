@@ -242,21 +242,6 @@ body {
   transform: scale(1.15);
 }
 
-.field-label {
-  display: block;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--color-text-muted);
-  margin-bottom: 6px;
-  transition: color 0.2s;
-}
-
-.datetime-cell:focus-within .field-label {
-  color: var(--gm-blue);
-}
-
 /* ─── Controls ───────────────────────────────────────── */
 .control {
   width: 100%;
@@ -301,29 +286,10 @@ select.control {
   background-size: 15px 15px;
 }
 
-/* Los pickers nativos de fecha/hora se ven oscuros en dark mode sin esto */
 @media (prefers-color-scheme: dark) {
-  .control::-webkit-calendar-picker-indicator {
-    filter: invert(1);
-  }
   select.control option {
     background: var(--color-bg-secondary);
     color: var(--color-text);
-  }
-}
-
-.datetime-grid {
-  display: grid;
-  grid-template-columns: 1.4fr 1fr 1fr;
-  gap: 10px;
-}
-
-@media (max-width: 380px) {
-  .datetime-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-  .datetime-cell:first-child {
-    grid-column: 1 / -1;
   }
 }
 
@@ -666,6 +632,11 @@ select.control {
   margin-top: 14px;
 }
 
+#outlook-hint {
+  text-align: center;
+  margin-top: 12px;
+}
+
 .page-foot {
   padding: 0.875rem 2.25rem;
   background: var(--color-bg-secondary);
@@ -750,7 +721,6 @@ select.control {
 .form-body > *:nth-child(1) { animation-delay: 0.34s; }
 .form-body > *:nth-child(2) { animation-delay: 0.42s; }
 .form-body > *:nth-child(3) { animation-delay: 0.50s; }
-.form-body > *:nth-child(4) { animation-delay: 0.58s; }
 
 .page-foot { animation: rise-in 0.5s ease-out 0.66s both; }
 

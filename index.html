@@ -31,9 +31,6 @@
     <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
       <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
     </symbol>
-    <symbol id="i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
-    </symbol>
     <symbol id="i-external" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" />
     </symbol>
@@ -86,29 +83,6 @@
 
       <section class="field-group">
         <p class="section-label">
-          <svg class="icon" aria-hidden="true"><use href="#i-calendar" /></svg>
-          Fecha y horario
-        </p>
-        <div class="datetime-grid">
-          <div class="datetime-cell">
-            <label class="field-label" for="date-input">Fecha</label>
-            <input class="control" id="date-input" name="date" type="date" required />
-          </div>
-          <div class="datetime-cell">
-            <label class="field-label" for="start-input">Inicio</label>
-            <input class="control" id="start-input" name="start" type="time" step="900" required />
-          </div>
-          <div class="datetime-cell">
-            <label class="field-label" for="end-input">Fin</label>
-            <input class="control" id="end-input" name="end" type="time" step="900" required />
-          </div>
-        </div>
-        <p class="hint" id="tz-note"></p>
-        <p class="error-msg" id="schedule-msg" role="alert" aria-live="polite"></p>
-      </section>
-
-      <section class="field-group">
-        <p class="section-label">
           <svg class="icon" aria-hidden="true"><use href="#i-user" /></svg>
           Invitados
         </p>
@@ -145,6 +119,7 @@
           <span id="copy-label">Copiar liga de la reunión</span>
         </button>
 
+        <p class="hint" id="outlook-hint">Fecha y horario se eligen en Outlook al abrir el borrador.</p>
         <p class="count-note" id="count-note"></p>
       </div>
 

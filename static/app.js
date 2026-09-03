@@ -1,10 +1,13 @@
 /* ─────────────────────────────────────────────────────
    RESERVA DE SALAS — Reserva vía Outlook Calendar
-   El deeplink se arma en el navegador para que el botón
-   sea un <a> real y los bloqueadores de pop-ups no lo corten.
+   En computadora el botón es un <a> real a Outlook Web
+   (los bloqueadores de pop-ups no lo cortan). En el
+   teléfono se abre la app de Outlook con el borrador.
    ───────────────────────────────────────────────────── */
 
-const OUTLOOK_COMPOSE_URL = 'https://outlook.office.com/calendar/action/compose';
+const OUTLOOK_WEB_COMPOSE = 'https://outlook.office.com/calendar/action/compose';
+const OUTLOOK_MOBILE_WEB = 'https://outlook.cloud.microsoft/owa';
+const OUTLOOK_APP_COMPOSE = 'ms-outlook://events/new';
 
 const config = {
   rooms: [
@@ -507,34 +510,141 @@ function setMessage(el, msg) {
 }
 
 /* ── Deeplink de Outlook ────────────────────────────── */
-function buildOutlookUrl() {
-  const subject = subjectInput.value.trim() || `Reunión — ${selectedRoom.name}`;
-  const attendees = [selectedRoom.email, ...guestEmails()].join(',');
+function isPhone() {
+  return (
+    /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  );
+}
 
+function isAndroid() {
+  return /Android/i.test(navigator.userAgent);
+}
+
+function meetingPayload() {
+  const subject = subjectInput.value.trim() || `Reunión — ${selectedRoom.name}`;
+  return {
+    subject,
+    location: selectedRoom.name,
+    attendees: [selectedRoom.email, ...guestEmails()].join(','),
+    body: ROOM_RULES_BODY,
+    bodyHtml: ROOM_RULES_BODY.replace(/\n/g, '<br>'),
+  };
+}
+
+function buildWebOutlookUrl() {
+  const meeting = meetingPayload();
   const params = new URLSearchParams({
     path: '/calendar/action/compose',
     rru: 'addevent',
-    subject,
-    location: selectedRoom.name,
-    to: attendees,
+    subject: meeting.subject,
+    location: meeting.location,
+    to: meeting.attendees,
     allday: 'false',
-    body: ROOM_RULES_BODY,
+    body: meeting.bodyHtml,
   });
+  return `${OUTLOOK_WEB_COMPOSE}?${params.toString()}`;
+}
 
-  return `${OUTLOOK_COMPOSE_URL}?${params.toString()}`;
+function buildMobileWebOutlookUrl() {
+  const meeting = meetingPayload();
+  const params = new URLSearchParams({
+    path: 'calendar/action/compose',
+    rru: 'addevent',
+    subject: meeting.subject,
+    location: meeting.location,
+    to: meeting.attendees,
+    allday: 'false',
+    body: meeting.bodyHtml,
+  });
+  return `${OUTLOOK_MOBILE_WEB}?${params.toString()}`;
+}
+
+function encodeAppQuery(params) {
+  return Object.entries(params)
+    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+    .join('&');
+}
+
+function buildAppQuery() {
+  const meeting = meetingPayload();
+  return encodeAppQuery({
+    title: meeting.subject,
+    location: meeting.location,
+    attendees: meeting.attendees,
+    description: meeting.body,
+  });
+}
+
+function buildAppOutlookUrl() {
+  return `${OUTLOOK_APP_COMPOSE}?${buildAppQuery()}`;
+}
+
+function buildAndroidIntentUrl() {
+  const fallback = encodeURIComponent(buildMobileWebOutlookUrl());
+  return `intent://events/new?${buildAppQuery()}#Intent;scheme=ms-outlook;package=com.microsoft.office.outlook;S.browser_fallback_url=${fallback};end`;
+}
+
+function buildOutlookUrl() {
+  if (isAndroid()) return buildAndroidIntentUrl();
+  if (isPhone()) return buildAppOutlookUrl();
+  return buildWebOutlookUrl();
 }
 
 function updateOutlookLink() {
   const url = buildOutlookUrl();
   openBtn.href = url;
+  if (isPhone()) {
+    openBtn.removeAttribute('target');
+    openBtn.removeAttribute('rel');
+  } else {
+    openBtn.target = '_blank';
+    openBtn.rel = 'noopener noreferrer';
+  }
   openBtn.removeAttribute('aria-disabled');
   copyBtn.removeAttribute('aria-disabled');
   resetCopyLabel();
   return url;
 }
 
+function openOutlook(event) {
+  if (!isPhone()) return;
+
+  event.preventDefault();
+
+  if (isAndroid()) {
+    window.location.href = buildAndroidIntentUrl();
+    return;
+  }
+
+  const appUrl = buildAppOutlookUrl();
+  const webUrl = buildMobileWebOutlookUrl();
+  let handedOff = false;
+  const markHandedOff = () => {
+    handedOff = true;
+  };
+
+  window.addEventListener('pagehide', markHandedOff, { once: true });
+  window.addEventListener('blur', markHandedOff, { once: true });
+  document.addEventListener(
+    'visibilitychange',
+    () => {
+      if (document.hidden) markHandedOff();
+    },
+    { once: true }
+  );
+
+  window.location.href = appUrl;
+
+  window.setTimeout(() => {
+    if (!handedOff && document.visibilityState === 'visible') {
+      window.location.href = webUrl;
+    }
+  }, 1400);
+}
+
 async function copyLink() {
-  const url = buildOutlookUrl();
+  const url = buildWebOutlookUrl();
   if (!url) return;
 
   try {
@@ -594,6 +704,7 @@ emailInput.addEventListener('blur', () => {
 subjectInput.addEventListener('input', updateOutlookLink);
 subjectInput.addEventListener('change', updateOutlookLink);
 
+openBtn.addEventListener('click', openOutlook);
 copyBtn.addEventListener('click', copyLink);
 
 /* ── Init ───────────────────────────────────────────── */

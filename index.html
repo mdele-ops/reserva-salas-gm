@@ -9,9 +9,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>Reservar sala — GM</title>
+  <title>Reserva de salas — Complejo Toluca</title>
   <link rel="icon" type="image/png" href="static/gm-logo.png" />
-  <link rel="stylesheet" href="static/styles.css" />
+  <link rel="stylesheet" href="static/styles.css?v=20260902-toluca" />
 </head>
 <body>
 
@@ -43,6 +43,9 @@
     <symbol id="i-rules" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
     </symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
+    </symbol>
   </svg>
 
   <main class="wrap">
@@ -50,9 +53,13 @@
     <header class="header">
       <img class="gm-logo" src="static/gm-logo.png" alt="General Motors" width="56" height="56" />
       <div class="header-text">
-        <p class="eyebrow">General Motors · Servicios corporativos</p>
+        <p class="eyebrow">General Motors</p>
+        <p class="site-name">
+          <svg class="icon" aria-hidden="true"><use href="#i-pin" /></svg>
+          Complejo Toluca
+        </p>
         <h1 id="room-title">RESERVA DE SALAS</h1>
-        <p class="header-sub">Lee el reglamento, elige la sala y busca participantes</p>
+        <p class="header-sub" id="header-sub">Consulte el reglamento, seleccione la sala e invite a los participantes</p>
       </div>
     </header>
 
@@ -64,7 +71,7 @@
             <svg class="icon" aria-hidden="true"><use href="#i-rules" /></svg>
             Reglamento de uso
           </summary>
-          <p class="hint rules-intro">Léelo antes de apartar. El mismo texto se incluye en el cuerpo de la invitación de Outlook.</p>
+          <p class="hint rules-intro">Consúltelo antes de reservar. El mismo texto se incluye en el cuerpo de la invitación de Outlook.</p>
           <div class="rules-grid">
             <article class="rule-card">
               <h2>1. Orden y limpieza</h2>
@@ -114,9 +121,9 @@
             Asunto
           </p>
           <input class="control" id="subject-input" name="subject" type="text"
-                 placeholder="Junta de seguimiento" autocomplete="off"
+                 placeholder="Reunión de seguimiento" autocomplete="off"
                  aria-label="Asunto de la reunión" />
-          <p class="hint">Si lo dejas vacío se usa el nombre de la sala.</p>
+          <p class="hint">Si el campo queda vacío, se utilizará el nombre de la sala.</p>
         </section>
       </div>
 
@@ -132,7 +139,7 @@
           <div class="guest-search">
             <svg class="guest-search-icon" aria-hidden="true"><use href="#i-search" /></svg>
             <input class="control add-input" id="email-input" type="text"
-                   placeholder="Buscar por nombre o correo @gm.com" autocomplete="off"
+                   placeholder="Buscar por nombre o correo corporativo" autocomplete="off"
                    spellcheck="false" role="combobox" aria-autocomplete="list"
                    aria-controls="guest-suggestions" aria-expanded="false"
                    aria-label="Buscar invitado en el directorio" />
@@ -143,7 +150,7 @@
             Agregar
           </button>
         </div>
-        <p class="hint" id="guest-hint">Al elegir a la persona se agrega su correo GM al borrador de Outlook.</p>
+        <p class="hint" id="guest-hint">Al seleccionar a la persona se agrega su correo corporativo al borrador de Outlook.</p>
         <p class="error-msg" id="error-msg" role="alert" aria-live="polite"></p>
       </section>
 
@@ -158,7 +165,7 @@
           <span id="copy-label">Copiar liga de la reunión</span>
         </button>
 
-        <p class="hint" id="outlook-hint">En el teléfono se abre la app con el borrador. Fecha y horario se eligen ahí. El reglamento va en el cuerpo.</p>
+        <p class="hint" id="outlook-hint">En dispositivos móviles se abre la aplicación con el borrador. Fecha y horario se definen ahí. El reglamento se incluye en el cuerpo de la invitación.</p>
         <p class="count-note" id="count-note"></p>
       </div>
 
@@ -169,11 +176,11 @@
     </noscript>
 
     <footer class="page-foot">
-      La sala se confirma cuando Exchange acepta la solicitud del recurso · Uso interno
+      Complejo Toluca · La reserva se confirma cuando Exchange acepta la solicitud del recurso · Uso interno
     </footer>
 
   </main>
 
-  <script src="static/app.js?v=20260902-outlook" defer></script>
+  <script src="static/app.js?v=20260902-toluca" defer></script>
 </body>
 </html>

@@ -9,13 +9,16 @@ const OUTLOOK_WEB_COMPOSE = 'https://outlook.office.com/calendar/action/compose'
 const OUTLOOK_MOBILE_WEB = 'https://outlook.cloud.microsoft/owa';
 const OUTLOOK_APP_COMPOSE = 'ms-outlook://events/new';
 
+const RULESET_JUNTAS = 'juntas';
+
+// Solo estas 5 llevan el reglamento actual. Salas nuevas: omitir `rules`.
 const config = {
   rooms: [
-    { name: 'Sala Colibrí',  email: 'SRR270201@gm.com' },
-    { name: 'Sala Maya',     email: 'SRR271627@gm.com' },
-    { name: 'Sala Alebrije', email: 'SRR240332@gm.com' },
-    { name: 'Sala Ajolote',  email: 'SRR265183@gm.com' },
-    { name: 'Sala Alfeñique', email: 'SRR210381@gm.com' },
+    { name: 'Sala Colibrí',  email: 'SRR270201@gm.com', rules: RULESET_JUNTAS },
+    { name: 'Sala Maya',     email: 'SRR271627@gm.com', rules: RULESET_JUNTAS },
+    { name: 'Sala Alebrije', email: 'SRR240332@gm.com', rules: RULESET_JUNTAS },
+    { name: 'Sala Ajolote',  email: 'SRR265183@gm.com', rules: RULESET_JUNTAS },
+    { name: 'Sala Alfeñique', email: 'SRR210381@gm.com', rules: RULESET_JUNTAS },
   ],
   allowedDomain: 'gm.com',
   defaultDurationMin: 60,
@@ -24,6 +27,13 @@ const config = {
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ROOM_STORAGE_KEY = 'salas.lastRoomEmail';
 const MAYA_EMAIL = 'SRR271627@gm.com';
+const JUNTAS_ROOM_EMAILS = new Set([
+  'srr270201@gm.com',
+  'srr271627@gm.com',
+  'srr240332@gm.com',
+  'srr265183@gm.com',
+  'srr210381@gm.com',
+]);
 
 const ROOM_RULES_BODY = [
   'REGLAMENTO DE USO DE SALAS DE JUNTAS',
@@ -72,6 +82,8 @@ const copyBtn      = document.getElementById('copy-btn');
 const copyLabel    = document.getElementById('copy-label');
 const countNote    = document.getElementById('count-note');
 const rulesGroup   = document.getElementById('rules-group');
+const headerSub    = document.getElementById('header-sub');
+const outlookHint  = document.getElementById('outlook-hint');
 
 /* ── Animación ──────────────────────────────────────── */
 const prefersReducedMotion = () =>
@@ -92,6 +104,24 @@ function findRoom(email) {
 
 function isRoomEmail(email) {
   return Boolean(findRoom(email));
+}
+
+function roomRules(room = selectedRoom) {
+  if (!room) return '';
+  if (room.rules) return room.rules;
+  return JUNTAS_ROOM_EMAILS.has((room.email || '').toLowerCase()) ? RULESET_JUNTAS : '';
+}
+
+function roomHasJuntasRules(room = selectedRoom) {
+  return roomRules(room) === RULESET_JUNTAS;
+}
+
+function applyKnownRules() {
+  config.rooms.forEach((room) => {
+    if (!room.rules && JUNTAS_ROOM_EMAILS.has((room.email || '').toLowerCase())) {
+      room.rules = RULESET_JUNTAS;
+    }
+  });
 }
 
 /* El navegador recuerda la última sala para no volver a elegirla cada vez. */
@@ -258,8 +288,8 @@ function renderSuggestions(query) {
     const empty = document.createElement('li');
     empty.className = 'guest-suggestion guest-suggestion-empty';
     empty.textContent = directory.length
-      ? 'Sin coincidencias en el directorio. También puedes escribir un correo @gm.com.'
-      : 'Escribe un correo @gm.com para agregar al invitado.';
+      ? 'Sin coincidencias en el directorio. También puede ingresar un correo @gm.com.'
+      : 'Ingrese un correo @gm.com para agregar al invitado.';
     suggestionsEl.appendChild(empty);
     suggestionsEl.hidden = false;
     emailInput.setAttribute('aria-expanded', 'true');
@@ -352,7 +382,7 @@ function addGuest() {
       return;
     }
     if (matches.length > 1) {
-      showError('Hay varias coincidencias. Elige a la persona de la lista.');
+      showError('Hay varias coincidencias. Seleccione a la persona de la lista.');
       renderSuggestions(value);
       return;
     }
@@ -368,7 +398,7 @@ function addGuestEmail(rawEmail, name = '') {
   if (!value) return;
 
   if (!EMAIL_RE.test(value)) {
-    showError('Busca un nombre del directorio o ingresa un correo válido.');
+    showError('Busque un nombre del directorio o ingrese un correo válido.');
     return;
   }
   if (!value.endsWith(`@${config.allowedDomain}`)) {
@@ -380,7 +410,7 @@ function addGuestEmail(rawEmail, name = '') {
     return;
   }
   if (isRoomEmail(value)) {
-    showError('Ese correo es de otra sala; elígela en la lista de arriba.');
+    showError('Ese correo corresponde a otra sala; selecciónela en la lista superior.');
     return;
   }
   if (guestEmails().includes(value)) {
@@ -414,12 +444,26 @@ function render() {
   if (titleChanged && hasRendered) replayAnimation(roomTitle, 'is-swapping');
 
   roomNote.textContent = `Buzón de la sala: ${selectedRoom.email}`;
-  document.title = `Reservar ${selectedRoom.name} — GM`;
+  document.title = `Reservar ${selectedRoom.name} — Complejo Toluca`;
+
+  const hasJuntasRules = roomHasJuntasRules();
   if (rulesGroup) {
+    rulesGroup.hidden = !hasJuntasRules;
     const isMaya =
-      selectedRoom.email.toLowerCase() === MAYA_EMAIL ||
-      fold(selectedRoom.name).includes('maya');
+      hasJuntasRules &&
+      (selectedRoom.email.toLowerCase() === MAYA_EMAIL ||
+        fold(selectedRoom.name).includes('maya'));
     rulesGroup.classList.toggle('is-maya', isMaya);
+  }
+  if (headerSub) {
+    headerSub.textContent = hasJuntasRules
+      ? 'Consulte el reglamento, seleccione la sala e invite a los participantes'
+      : 'Seleccione la sala e invite a los participantes';
+  }
+  if (outlookHint) {
+    outlookHint.textContent = hasJuntasRules
+      ? 'En dispositivos móviles se abre la aplicación con el borrador. Fecha y horario se definen ahí. El reglamento se incluye en el cuerpo de la invitación.'
+      : 'En dispositivos móviles se abre la aplicación con el borrador. Fecha y horario se definen ahí.';
   }
 
   pillRow.replaceChildren();
@@ -523,12 +567,13 @@ function isAndroid() {
 
 function meetingPayload() {
   const subject = subjectInput.value.trim() || `Reunión — ${selectedRoom.name}`;
+  const body = roomHasJuntasRules() ? ROOM_RULES_BODY : '';
   return {
     subject,
     location: selectedRoom.name,
     attendees: [selectedRoom.email, ...guestEmails()].join(','),
-    body: ROOM_RULES_BODY,
-    bodyHtml: ROOM_RULES_BODY.replace(/\n/g, '<br>'),
+    body,
+    bodyHtml: body ? body.replace(/\n/g, '<br>') : '',
   };
 }
 
@@ -541,8 +586,8 @@ function buildWebOutlookUrl() {
     location: meeting.location,
     to: meeting.attendees,
     allday: 'false',
-    body: meeting.bodyHtml,
   });
+  if (meeting.bodyHtml) params.set('body', meeting.bodyHtml);
   return `${OUTLOOK_WEB_COMPOSE}?${params.toString()}`;
 }
 
@@ -555,8 +600,8 @@ function buildMobileWebOutlookUrl() {
     location: meeting.location,
     to: meeting.attendees,
     allday: 'false',
-    body: meeting.bodyHtml,
   });
+  if (meeting.bodyHtml) params.set('body', meeting.bodyHtml);
   return `${OUTLOOK_MOBILE_WEB}?${params.toString()}`;
 }
 
@@ -568,12 +613,13 @@ function encodeAppQuery(params) {
 
 function buildAppQuery() {
   const meeting = meetingPayload();
-  return encodeAppQuery({
+  const params = {
     title: meeting.subject,
     location: meeting.location,
     attendees: meeting.attendees,
-    description: meeting.body,
-  });
+  };
+  if (meeting.body) params.description = meeting.body;
+  return encodeAppQuery(params);
 }
 
 function buildAppOutlookUrl() {
@@ -662,7 +708,7 @@ async function copyLink() {
     helper.remove();
   }
 
-  copyLabel.textContent = '¡Liga copiada!';
+  copyLabel.textContent = 'Liga copiada';
   copyBtn.classList.add('is-done');
   setTimeout(resetCopyLabel, 2000);
 }
@@ -679,6 +725,7 @@ async function loadConfig() {
     if (!data) return;
     if (!Array.isArray(data.rooms) || data.rooms.length === 0) delete data.rooms;
     Object.assign(config, data);
+    applyKnownRules();
 
     renderRoomOptions();
     emailInput.placeholder = `Nombre o usuario@${config.allowedDomain}`;
@@ -708,6 +755,7 @@ openBtn.addEventListener('click', openOutlook);
 copyBtn.addEventListener('click', copyLink);
 
 /* ── Init ───────────────────────────────────────────── */
+applyKnownRules();
 renderRoomOptions();
 render();
 loadDirectory();

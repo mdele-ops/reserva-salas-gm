@@ -2,23 +2,28 @@
   "rooms": [
     {
       "name": "Sala Colibrí",
-      "email": "SRR270201@gm.com"
+      "email": "SRR270201@gm.com",
+      "rules": "juntas"
     },
     {
       "name": "Sala Maya",
-      "email": "SRR271627@gm.com"
+      "email": "SRR271627@gm.com",
+      "rules": "juntas"
     },
     {
       "name": "Sala Alebrije",
-      "email": "SRR240332@gm.com"
+      "email": "SRR240332@gm.com",
+      "rules": "juntas"
     },
     {
       "name": "Sala Ajolote",
-      "email": "SRR265183@gm.com"
+      "email": "SRR265183@gm.com",
+      "rules": "juntas"
     },
     {
       "name": "Sala Alfeñique",
-      "email": "SRR210381@gm.com"
+      "email": "SRR210381@gm.com",
+      "rules": "juntas"
     }
   ],
   "allowedDomain": "gm.com",

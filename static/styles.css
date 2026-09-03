@@ -148,7 +148,9 @@ body {
   align-items: center;
   gap: 18px;
   padding: 1.75rem 2.25rem;
-  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-deep) 100%);
+  background:
+    linear-gradient(90deg, var(--gm-blue) 0, var(--gm-blue) 4px, transparent 4px),
+    linear-gradient(135deg, var(--navy) 0%, var(--navy-deep) 100%);
   border-bottom: 1px solid var(--color-border);
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
@@ -177,6 +179,24 @@ body {
   color: rgba(255, 255, 255, 0.55);
 }
 
+.site-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.site-name .icon {
+  width: 13px;
+  height: 13px;
+  color: #7ec4f5;
+}
+
 .header-text h1 {
   font-family: var(--font-display);
   font-size: 21px;
@@ -184,7 +204,9 @@ body {
   letter-spacing: 0.07em;
   line-height: 1.25;
   color: #ffffff;
-  margin-top: 6px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
 }
 
 .header-sub {
@@ -248,6 +270,10 @@ body {
 /* ─── Reglamento ─────────────────────────────────────── */
 .rules-group {
   margin-bottom: 1.75rem;
+}
+
+.rules-group[hidden] {
+  display: none;
 }
 
 .rules {
@@ -849,8 +875,9 @@ select.control {
 
 .gm-logo   { animation: logo-in 0.5s cubic-bezier(0.16, 0.84, 0.44, 1) 0.12s both; }
 .eyebrow   { animation: eyebrow-in 0.7s ease-out 0.2s both; }
-.header-text h1 { animation: title-in 0.6s cubic-bezier(0.16, 0.84, 0.44, 1) 0.28s both; }
-.header-sub     { animation: rise-in 0.5s ease-out 0.36s both; }
+.site-name { animation: rise-in 0.5s ease-out 0.26s both; }
+.header-text h1 { animation: title-in 0.6s cubic-bezier(0.16, 0.84, 0.44, 1) 0.34s both; }
+.header-sub     { animation: rise-in 0.5s ease-out 0.42s both; }
 
 .form-body > *  { animation: rise-in 0.5s cubic-bezier(0.16, 0.84, 0.44, 1) both; }
 .form-body > *:nth-child(1) { animation-delay: 0.34s; }

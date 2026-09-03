@@ -20,6 +20,29 @@ const config = {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ROOM_STORAGE_KEY = 'salas.lastRoomEmail';
+const MAYA_EMAIL = 'SRR271627@gm.com';
+
+const ROOM_RULES_BODY = [
+  'REGLAMENTO DE USO DE SALAS DE JUNTAS',
+  '',
+  '1. Orden y limpieza',
+  '• Configuración original: acomode sillas y mesas como se encontraron.',
+  '• Cero basura: llévese envases y envolturas. No deje derrames.',
+  '• Consumo: solo en Sala Maya se permiten snacks; en las demás, únicamente agua.',
+  '',
+  '2. Cuidado del mobiliario y equipo',
+  '• Uso adecuado: evite sentarse en descansabrazos y no raye mesas.',
+  '• Equipo de TI: apague pantallas/proyectores y ordene cables.',
+  '• Reporte de daños: infórmelos de inmediato para evitar que se le responsabilice.',
+  '',
+  '3. Gestión de horarios',
+  '• Puntualidad de salida: desocupe un par de minutos antes de finalizar.',
+  '• Libere si no usa: cancele la reserva de inmediato si no se ocupará.',
+  '• Salas "fantasma": pasados 10 minutos de tolerancia, la sala queda libre.',
+  '',
+  '4. Incumplimiento',
+  'En caso de daño, desperfecto o mal uso reiterado se aplicarán las medidas del Reglamento Interno de Trabajo.',
+].join('\n');
 
 let guests = []; // { email, name }
 let selectedRoom = config.rooms[0];
@@ -45,6 +68,7 @@ const openBtn      = document.getElementById('open-btn');
 const copyBtn      = document.getElementById('copy-btn');
 const copyLabel    = document.getElementById('copy-label');
 const countNote    = document.getElementById('count-note');
+const rulesGroup   = document.getElementById('rules-group');
 
 /* ── Animación ──────────────────────────────────────── */
 const prefersReducedMotion = () =>
@@ -388,6 +412,12 @@ function render() {
 
   roomNote.textContent = `Buzón de la sala: ${selectedRoom.email}`;
   document.title = `Reservar ${selectedRoom.name} — GM`;
+  if (rulesGroup) {
+    const isMaya =
+      selectedRoom.email.toLowerCase() === MAYA_EMAIL ||
+      fold(selectedRoom.name).includes('maya');
+    rulesGroup.classList.toggle('is-maya', isMaya);
+  }
 
   pillRow.replaceChildren();
   pillRow.appendChild(buildPill(selectedRoom.email, { locked: true }));
@@ -488,6 +518,7 @@ function buildOutlookUrl() {
     location: selectedRoom.name,
     to: attendees,
     allday: 'false',
+    body: ROOM_RULES_BODY,
   });
 
   return `${OUTLOOK_COMPOSE_URL}?${params.toString()}`;

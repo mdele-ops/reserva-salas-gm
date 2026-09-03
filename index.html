@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="robots" content="noindex, nofollow" />
   <title>Reservar sala — GM</title>
-  <link rel="icon" href="data:," />
+  <link rel="icon" type="image/png" href="static/gm-logo.png" />
   <link rel="stylesheet" href="static/styles.css" />
 </head>
 <body>
@@ -40,24 +40,63 @@
     <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
       <polyline points="20 6 9 17 4 12" />
     </symbol>
+    <symbol id="i-rules" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    </symbol>
   </svg>
 
   <main class="wrap">
 
     <header class="header">
-      <svg class="gm-logo" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="General Motors">
-        <rect width="52" height="52" rx="8" fill="#0072CE" />
-        <text x="26" y="33" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="20" font-weight="900" fill="#ffffff" letter-spacing="-1">GM</text>
-        <rect x="10" y="38" width="32" height="2.5" rx="1.25" fill="#ffffff" opacity="0.35" />
-      </svg>
+      <img class="gm-logo" src="static/gm-logo.png" alt="General Motors" width="56" height="56" />
       <div class="header-text">
         <p class="eyebrow">General Motors · Servicios corporativos</p>
         <h1 id="room-title">RESERVA DE SALAS</h1>
-        <p class="header-sub">Elige la sala y busca participantes en el directorio</p>
+        <p class="header-sub">Lee el reglamento, elige la sala y busca participantes</p>
       </div>
     </header>
 
     <form class="form-body" id="booking-form" novalidate>
+
+      <section class="field-group rules-group" id="rules-group">
+        <details class="rules" open>
+          <summary class="section-label rules-summary">
+            <svg class="icon" aria-hidden="true"><use href="#i-rules" /></svg>
+            Reglamento de uso
+          </summary>
+          <p class="hint rules-intro">Léelo antes de apartar. El mismo texto se incluye en el cuerpo de la invitación de Outlook.</p>
+          <div class="rules-grid">
+            <article class="rule-card">
+              <h2>1. Orden y limpieza</h2>
+              <ul>
+                <li><strong>Configuración original:</strong> acomode sillas y mesas como se encontraron.</li>
+                <li><strong>Cero basura:</strong> llévese envases y envolturas. No deje derrames.</li>
+                <li class="rule-consumo"><strong>Consumo:</strong> solo en <strong>Sala Maya</strong> se permiten snacks; en las demás, únicamente agua.</li>
+              </ul>
+            </article>
+            <article class="rule-card">
+              <h2>2. Cuidado del mobiliario y equipo</h2>
+              <ul>
+                <li><strong>Uso adecuado:</strong> evite sentarse en descansabrazos y no raye mesas.</li>
+                <li><strong>Equipo de TI:</strong> apague pantallas/proyectores y ordene cables.</li>
+                <li><strong>Reporte de daños:</strong> infórmelos de inmediato para evitar que se le responsabilice.</li>
+              </ul>
+            </article>
+            <article class="rule-card">
+              <h2>3. Gestión de horarios</h2>
+              <ul>
+                <li><strong>Puntualidad de salida:</strong> desocupe un par de minutos antes de finalizar.</li>
+                <li><strong>Libere si no usa:</strong> cancele la reserva de inmediato si no se ocupará.</li>
+                <li><strong>Salas «fantasma»:</strong> pasados 10 minutos de tolerancia, la sala queda libre.</li>
+              </ul>
+            </article>
+            <article class="rule-card rule-card-alert">
+              <h2>4. Incumplimiento</h2>
+              <p>En caso de daño, desperfecto o mal uso reiterado se aplicarán las medidas del <strong>Reglamento Interno de Trabajo</strong>.</p>
+            </article>
+          </div>
+        </details>
+      </section>
 
       <div class="grid-2">
         <section class="field-group">
@@ -119,7 +158,7 @@
           <span id="copy-label">Copiar liga de la reunión</span>
         </button>
 
-        <p class="hint" id="outlook-hint">Fecha y horario se eligen en Outlook al abrir el borrador.</p>
+        <p class="hint" id="outlook-hint">Fecha y horario se eligen en Outlook. El reglamento va en el cuerpo de la invitación.</p>
         <p class="count-note" id="count-note"></p>
       </div>
 

@@ -1,0 +1,27 @@
+{
+  "rooms": [
+    {
+      "name": "Sala Colibrí",
+      "email": "SRR270201@gm.com"
+    },
+    {
+      "name": "Sala Maya",
+      "email": "SRR271627@gm.com"
+    },
+    {
+      "name": "Sala Alebrije",
+      "email": "SRR240332@gm.com"
+    },
+    {
+      "name": "Sala Ajolote",
+      "email": "SRR265183@gm.com"
+    },
+    {
+      "name": "Sala Alfeñique",
+      "email": "SRR210381@gm.com"
+    }
+  ],
+  "allowedDomain": "gm.com",
+  "defaultDurationMin": 60,
+  "directoryCount": 2511
+}

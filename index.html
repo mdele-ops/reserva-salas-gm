@@ -9,9 +9,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="robots" content="noindex, nofollow" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>Reserva de salas — Complejo Toluca</title>
   <link rel="icon" type="image/png" href="static/gm-logo.png" />
-  <link rel="stylesheet" href="static/styles.css?v=20260902-toluca" />
+  <link rel="stylesheet" href="static/styles.css?v=20260904-1153" />
 </head>
 <body>
 
@@ -51,59 +52,27 @@
   <main class="wrap">
 
     <header class="header">
-      <img class="gm-logo" src="static/gm-logo.png" alt="General Motors" width="56" height="56" />
-      <div class="header-text">
-        <p class="eyebrow">General Motors</p>
-        <p class="site-name">
-          <svg class="icon" aria-hidden="true"><use href="#i-pin" /></svg>
-          Complejo Toluca
-        </p>
+      <div class="header-brand">
+        <div class="logo-plate">
+          <img class="gm-logo" src="static/gm-logo.png" alt="General Motors" width="64" height="64" />
+        </div>
+        <div class="header-text">
+          <p class="eyebrow">General Motors</p>
+          <p class="site-name">
+            <svg class="icon" aria-hidden="true"><use href="#i-pin" /></svg>
+            Complejo Toluca
+          </p>
+        </div>
+        <span class="header-badge">Uso interno</span>
+      </div>
+      <div class="header-hero">
+        <p class="header-kicker">Reserva de salas</p>
         <h1 id="room-title">RESERVA DE SALAS</h1>
-        <p class="header-sub" id="header-sub">Consulte el reglamento, seleccione la sala e invite a los participantes</p>
+        <p class="header-sub" id="header-sub">Seleccione la sala, invite a los participantes y consulte el reglamento</p>
       </div>
     </header>
 
     <form class="form-body" id="booking-form" novalidate>
-
-      <section class="field-group rules-group" id="rules-group">
-        <details class="rules" open>
-          <summary class="section-label rules-summary">
-            <svg class="icon" aria-hidden="true"><use href="#i-rules" /></svg>
-            Reglamento de uso
-          </summary>
-          <p class="hint rules-intro">Consúltelo antes de reservar. El mismo texto se incluye en el cuerpo de la invitación de Outlook.</p>
-          <div class="rules-grid">
-            <article class="rule-card">
-              <h2>1. Orden y limpieza</h2>
-              <ul>
-                <li><strong>Configuración original:</strong> acomode sillas y mesas como se encontraron.</li>
-                <li><strong>Cero basura:</strong> llévese envases y envolturas. No deje derrames.</li>
-                <li class="rule-consumo"><strong>Consumo:</strong> solo en <strong>Sala Maya</strong> se permiten snacks; en las demás, únicamente agua.</li>
-              </ul>
-            </article>
-            <article class="rule-card">
-              <h2>2. Cuidado del mobiliario y equipo</h2>
-              <ul>
-                <li><strong>Uso adecuado:</strong> evite sentarse en descansabrazos y no raye mesas.</li>
-                <li><strong>Equipo de TI:</strong> apague pantallas/proyectores y ordene cables.</li>
-                <li><strong>Reporte de daños:</strong> infórmelos de inmediato para evitar que se le responsabilice.</li>
-              </ul>
-            </article>
-            <article class="rule-card">
-              <h2>3. Gestión de horarios</h2>
-              <ul>
-                <li><strong>Puntualidad de salida:</strong> desocupe un par de minutos antes de finalizar.</li>
-                <li><strong>Libere si no usa:</strong> cancele la reserva de inmediato si no se ocupará.</li>
-                <li><strong>Salas «fantasma»:</strong> pasados 10 minutos de tolerancia, la sala queda libre.</li>
-              </ul>
-            </article>
-            <article class="rule-card rule-card-alert">
-              <h2>4. Incumplimiento</h2>
-              <p>En caso de daño, desperfecto o mal uso reiterado se aplicarán las medidas del <strong>Reglamento Interno de Trabajo</strong>.</p>
-            </article>
-          </div>
-        </details>
-      </section>
 
       <div class="grid-2">
         <section class="field-group">
@@ -154,7 +123,48 @@
         <p class="error-msg" id="error-msg" role="alert" aria-live="polite"></p>
       </section>
 
+      <section class="field-group rules-group" id="rules-group">
+        <details class="rules" open>
+          <summary class="section-label rules-summary">
+            <svg class="icon" aria-hidden="true"><use href="#i-rules" /></svg>
+            Reglamento de uso
+          </summary>
+          <p class="hint rules-intro">Consúltelo antes de reservar. El mismo texto se incluye en el cuerpo de la invitación de Outlook.</p>
+          <div class="rules-grid">
+            <article class="rule-card">
+              <h2><span class="rule-index">01</span> Orden y limpieza</h2>
+              <ul>
+                <li><strong>Configuración original:</strong> acomode sillas y mesas como se encontraron.</li>
+                <li><strong>Cero basura:</strong> llévese envases y envolturas. No deje derrames.</li>
+                <li class="rule-consumo"><strong>Consumo:</strong> solo en <strong>Sala Maya</strong> se permiten snacks; en las demás, únicamente agua.</li>
+              </ul>
+            </article>
+            <article class="rule-card">
+              <h2><span class="rule-index">02</span> Cuidado del mobiliario y equipo</h2>
+              <ul>
+                <li><strong>Uso adecuado:</strong> evite sentarse en descansabrazos y no raye mesas.</li>
+                <li><strong>Equipo de TI:</strong> apague pantallas/proyectores y ordene cables.</li>
+                <li><strong>Reporte de daños:</strong> infórmelos de inmediato para evitar que se le responsabilice.</li>
+              </ul>
+            </article>
+            <article class="rule-card">
+              <h2><span class="rule-index">03</span> Gestión de horarios</h2>
+              <ul>
+                <li><strong>Puntualidad de salida:</strong> desocupe un par de minutos antes de finalizar.</li>
+                <li><strong>Libere si no usa:</strong> cancele la reserva de inmediato si no se ocupará.</li>
+                <li><strong>Salas «fantasma»:</strong> pasados 10 minutos de tolerancia, la sala queda libre.</li>
+              </ul>
+            </article>
+            <article class="rule-card rule-card-alert">
+              <h2><span class="rule-index">04</span> Incumplimiento</h2>
+              <p>En caso de daño, desperfecto o mal uso reiterado se aplicarán las medidas del <strong>Reglamento Interno de Trabajo</strong>.</p>
+            </article>
+          </div>
+        </details>
+      </section>
+
       <div class="actions">
+        <p class="actions-kicker">Confirmar reserva</p>
         <a class="btn btn-open" id="open-btn" href="#" target="_blank" rel="noopener noreferrer">
           <svg class="icon" aria-hidden="true"><use href="#i-external" /></svg>
           Abrir en Outlook
@@ -176,11 +186,15 @@
     </noscript>
 
     <footer class="page-foot">
-      Complejo Toluca · La reserva se confirma cuando Exchange acepta la solicitud del recurso · Uso interno
+      <span>Complejo Toluca</span>
+      <span class="foot-dot" aria-hidden="true"></span>
+      <span>La reserva se confirma cuando Exchange acepta la solicitud del recurso</span>
+      <span class="foot-dot" aria-hidden="true"></span>
+      <span>Uso interno</span>
     </footer>
 
   </main>
 
-  <script src="static/app.js?v=20260904-sala" defer></script>
+  <script src="static/app.js?v=20260904-1153" defer></script>
 </body>
 </html>

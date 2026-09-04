@@ -11,7 +11,6 @@ const OUTLOOK_APP_COMPOSE = 'ms-outlook://events/new';
 
 const RULESET_JUNTAS = 'juntas';
 
-// Solo estas 5 llevan el reglamento actual. Salas nuevas: omitir `rules`.
 const config = {
   rooms: [
     { name: 'Sala Colibrí',  email: 'SRR270201@gm.com', rules: RULESET_JUNTAS },
@@ -19,6 +18,12 @@ const config = {
     { name: 'Sala Alebrije', email: 'SRR240332@gm.com', rules: RULESET_JUNTAS },
     { name: 'Sala Ajolote',  email: 'SRR265183@gm.com', rules: RULESET_JUNTAS },
     { name: 'Sala Alfeñique', email: 'SRR210381@gm.com', rules: RULESET_JUNTAS },
+    { name: 'Sala Cosmovitral', email: 'SRR295794@gm.com', rules: RULESET_JUNTAS },
+    { name: 'Sala Árbol de la vida', email: 'SRR233942@gm.com', rules: RULESET_JUNTAS },
+    { name: 'Sala Los Portales', email: 'SRR271700@gm.com', rules: RULESET_JUNTAS },
+    { name: 'Sala La Marquesa', email: 'SRR287390@gm.com', rules: RULESET_JUNTAS },
+    { name: 'Sala Tollotzin', email: 'SRR223991@gm.com', rules: RULESET_JUNTAS },
+    { name: 'Sala Xinantecatl', email: 'SRR268423@gm.com', rules: RULESET_JUNTAS },
   ],
   allowedDomain: 'gm.com',
   defaultDurationMin: 60,
@@ -27,13 +32,6 @@ const config = {
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ROOM_STORAGE_KEY = 'salas.lastRoomEmail';
 const MAYA_EMAIL = 'SRR271627@gm.com';
-const JUNTAS_ROOM_EMAILS = new Set([
-  'srr270201@gm.com',
-  'srr271627@gm.com',
-  'srr240332@gm.com',
-  'srr265183@gm.com',
-  'srr210381@gm.com',
-]);
 
 const ROOM_RULES_BODY = [
   'REGLAMENTO DE USO DE SALAS DE JUNTAS',
@@ -166,9 +164,7 @@ function syncRoomUrl(room) {
 }
 
 function roomRules(room = selectedRoom) {
-  if (!room) return '';
-  if (room.rules) return room.rules;
-  return JUNTAS_ROOM_EMAILS.has((room.email || '').toLowerCase()) ? RULESET_JUNTAS : '';
+  return (room && room.rules) || RULESET_JUNTAS;
 }
 
 function roomHasJuntasRules(room = selectedRoom) {
@@ -177,9 +173,7 @@ function roomHasJuntasRules(room = selectedRoom) {
 
 function applyKnownRules() {
   config.rooms.forEach((room) => {
-    if (!room.rules && JUNTAS_ROOM_EMAILS.has((room.email || '').toLowerCase())) {
-      room.rules = RULESET_JUNTAS;
-    }
+    if (!room.rules) room.rules = RULESET_JUNTAS;
   });
 }
 
@@ -316,6 +310,7 @@ function hideSuggestions() {
   activeSuggestion = -1;
   suggestionsEl.replaceChildren();
   suggestionsEl.hidden = true;
+  suggestionsEl.classList.remove('is-open');
   emailInput.setAttribute('aria-expanded', 'false');
   emailInput.removeAttribute('aria-activedescendant');
 }
@@ -337,6 +332,14 @@ function setActiveSuggestion(index) {
   });
 }
 
+function openSuggestions() {
+  const wasHidden = suggestionsEl.hidden;
+  suggestionsEl.hidden = false;
+  emailInput.setAttribute('aria-expanded', 'true');
+  if (wasHidden) replayAnimation(suggestionsEl, 'is-open');
+  else suggestionsEl.classList.add('is-open');
+}
+
 function renderSuggestions(query) {
   suggestions = searchDirectory(query);
   suggestionsEl.replaceChildren();
@@ -353,8 +356,7 @@ function renderSuggestions(query) {
       ? 'Sin coincidencias en el directorio. También puede ingresar un correo @gm.com.'
       : 'Ingrese un correo @gm.com para agregar al invitado.';
     suggestionsEl.appendChild(empty);
-    suggestionsEl.hidden = false;
-    emailInput.setAttribute('aria-expanded', 'true');
+    openSuggestions();
     activeSuggestion = -1;
     return;
   }
@@ -383,8 +385,7 @@ function renderSuggestions(query) {
     suggestionsEl.appendChild(item);
   });
 
-  suggestionsEl.hidden = false;
-  emailInput.setAttribute('aria-expanded', 'true');
+  openSuggestions();
   setActiveSuggestion(0);
 }
 
@@ -488,6 +489,7 @@ function addGuestEmail(rawEmail, name = '') {
   lastAddedGuest = value;
   emailInput.value = '';
   hideSuggestions();
+  if (!prefersReducedMotion()) replayAnimation(addBtn, 'is-added');
   render();
 }
 
@@ -501,10 +503,10 @@ function removeGuest(email) {
 function render() {
   const title = selectedRoom.name.toUpperCase();
   const titleChanged = roomTitle.textContent !== title;
+  const prevCount = countNote.textContent;
+  const wasMaya = Boolean(rulesGroup && rulesGroup.classList.contains('is-maya'));
 
   roomTitle.textContent = title;
-  if (titleChanged && hasRendered) replayAnimation(roomTitle, 'is-swapping');
-
   roomNote.textContent = `Buzón de la sala: ${selectedRoom.email}`;
   document.title = `Reservar ${selectedRoom.name} — Complejo Toluca`;
   syncRoomUrl(selectedRoom);
@@ -517,10 +519,14 @@ function render() {
       (selectedRoom.email.toLowerCase() === MAYA_EMAIL ||
         fold(selectedRoom.name).includes('maya'));
     rulesGroup.classList.toggle('is-maya', isMaya);
+    if (isMaya && !wasMaya && hasRendered) {
+      const consumo = rulesGroup.querySelector('.rule-consumo');
+      if (consumo) replayAnimation(consumo, 'is-highlight');
+    }
   }
   if (headerSub) {
     headerSub.textContent = hasJuntasRules
-      ? 'Consulte el reglamento, seleccione la sala e invite a los participantes'
+      ? 'Seleccione la sala, invite a los participantes y consulte el reglamento'
       : 'Seleccione la sala e invite a los participantes';
   }
   if (outlookHint) {
@@ -529,13 +535,23 @@ function render() {
       : 'En dispositivos móviles se abre la aplicación con el borrador. Fecha y horario se definen ahí.';
   }
 
+  if (titleChanged && hasRendered) {
+    replayAnimation(roomTitle, 'is-swapping');
+    replayAnimation(roomNote, 'is-shown');
+    if (headerSub) replayAnimation(headerSub, 'is-shown');
+  }
+
   pillRow.replaceChildren();
-  pillRow.appendChild(buildPill(selectedRoom.email, { locked: true }));
+  const roomPill = buildPill(selectedRoom.email, { locked: true });
+  if (titleChanged && hasRendered) roomPill.classList.add('is-new');
+  pillRow.appendChild(roomPill);
   guests.forEach((guest) => pillRow.appendChild(buildPill(guest)));
   lastAddedGuest = null;
 
   const total = guests.length + 1;
-  countNote.textContent = `${total} destinatario${total === 1 ? '' : 's'} (sala incluida)`;
+  const nextCount = `${total} destinatario${total === 1 ? '' : 's'} (sala incluida)`;
+  countNote.textContent = nextCount;
+  if (hasRendered && prevCount !== nextCount) replayAnimation(countNote, 'is-shown');
 
   updateOutlookLink();
   hasRendered = true;
@@ -826,6 +842,19 @@ subjectInput.addEventListener('change', updateOutlookLink);
 
 openBtn.addEventListener('click', openOutlook);
 copyBtn.addEventListener('click', copyLink);
+
+const rulesEl = document.querySelector('.rules');
+if (rulesEl && rulesGroup) {
+  rulesEl.addEventListener('toggle', () => {
+    if (!rulesEl.open || prefersReducedMotion()) return;
+    rulesGroup.querySelectorAll('.rule-card').forEach((card, index) => {
+      card.style.setProperty('--enter-delay', `${index * 55}ms`);
+      replayAnimation(card, 'is-entering');
+    });
+    const intro = rulesGroup.querySelector('.rules-intro');
+    if (intro) replayAnimation(intro, 'is-entering');
+  });
+}
 
 /* ── Init ───────────────────────────────────────────── */
 applyKnownRules();

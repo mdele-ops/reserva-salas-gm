@@ -24,6 +24,36 @@
       "name": "Sala Alfeñique",
       "email": "SRR210381@gm.com",
       "rules": "juntas"
+    },
+    {
+      "name": "Sala Cosmovitral",
+      "email": "SRR295794@gm.com",
+      "rules": "juntas"
+    },
+    {
+      "name": "Sala Árbol de la vida",
+      "email": "SRR233942@gm.com",
+      "rules": "juntas"
+    },
+    {
+      "name": "Sala Los Portales",
+      "email": "SRR271700@gm.com",
+      "rules": "juntas"
+    },
+    {
+      "name": "Sala La Marquesa",
+      "email": "SRR287390@gm.com",
+      "rules": "juntas"
+    },
+    {
+      "name": "Sala Tollotzin",
+      "email": "SRR223991@gm.com",
+      "rules": "juntas"
+    },
+    {
+      "name": "Sala Xinantecatl",
+      "email": "SRR268423@gm.com",
+      "rules": "juntas"
     }
   ],
   "allowedDomain": "gm.com",

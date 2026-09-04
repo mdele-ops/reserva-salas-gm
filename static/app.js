@@ -106,6 +106,65 @@ function isRoomEmail(email) {
   return Boolean(findRoom(email));
 }
 
+function roomSlug(room) {
+  return fold(room && room.name)
+    .replace(/^sala\s+/, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function findRoomBySlug(slug) {
+  const needle = fold(slug)
+    .replace(/^sala\s+/, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  if (!needle) return null;
+  return config.rooms.find((room) => roomSlug(room) === needle) || null;
+}
+
+function findRoomByIdentifier(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return null;
+  return (
+    findRoom(raw) ||
+    findRoomBySlug(raw) ||
+    config.rooms.find((room) => fold(room.name) === fold(raw)) ||
+    null
+  );
+}
+
+function readRoomFromUrl() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const fromQuery = findRoomByIdentifier(params.get('sala') || params.get('room'));
+    if (fromQuery) return fromQuery;
+
+    const hash = decodeURIComponent((window.location.hash || '').replace(/^#/, '').trim());
+    return findRoomByIdentifier(hash);
+  } catch {
+    return null;
+  }
+}
+
+function syncRoomUrl(room) {
+  if (!room || !window.history || typeof window.history.replaceState !== 'function') return;
+  try {
+    const url = new URL(window.location.href);
+    const slug = roomSlug(room);
+    if (!slug) return;
+    if (url.searchParams.get('sala') === slug && !url.searchParams.has('room')) return;
+
+    url.searchParams.set('sala', slug);
+    url.searchParams.delete('room');
+    const hashValue = (url.hash || '').replace(/^#/, '');
+    if (hashValue && findRoomByIdentifier(hashValue)) url.hash = '';
+
+    window.history.replaceState({ sala: slug }, '', `${url.pathname}${url.search}${url.hash}`);
+  } catch {
+    // El identificador es informativo; si el historial no se puede tocar, no bloquea la reserva.
+  }
+}
+
 function roomRules(room = selectedRoom) {
   if (!room) return '';
   if (room.rules) return room.rules;
@@ -152,7 +211,10 @@ function renderRoomOptions() {
   });
 
   selectedRoom =
-    findRoom(readStoredRoom()) || findRoom(selectedRoom && selectedRoom.email) || config.rooms[0];
+    readRoomFromUrl() ||
+    findRoom(readStoredRoom()) ||
+    findRoom(selectedRoom && selectedRoom.email) ||
+    config.rooms[0];
   roomSelect.value = selectedRoom.email;
 }
 
@@ -445,6 +507,7 @@ function render() {
 
   roomNote.textContent = `Buzón de la sala: ${selectedRoom.email}`;
   document.title = `Reservar ${selectedRoom.name} — Complejo Toluca`;
+  syncRoomUrl(selectedRoom);
 
   const hasJuntasRules = roomHasJuntasRules();
   if (rulesGroup) {
@@ -738,6 +801,16 @@ async function loadConfig() {
 form.addEventListener('submit', (e) => e.preventDefault());
 
 roomSelect.addEventListener('change', () => selectRoom(roomSelect.value));
+
+window.addEventListener('popstate', () => {
+  const room = readRoomFromUrl();
+  if (!room || room.email === selectedRoom.email) return;
+  selectedRoom = room;
+  storeRoom(room.email);
+  roomSelect.value = room.email;
+  showError('');
+  render();
+});
 
 addBtn.addEventListener('click', addGuest);
 

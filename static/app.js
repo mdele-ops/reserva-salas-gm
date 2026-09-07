@@ -31,7 +31,11 @@ const config = {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ROOM_STORAGE_KEY = 'salas.lastRoomEmail';
-const MAYA_EMAIL = 'SRR271627@gm.com';
+const FOOD_ROOM_EMAILS = new Set([
+  'srr271627@gm.com', // Maya
+  'srr240332@gm.com', // Alebrije
+  'srr295794@gm.com', // Cosmovitral (solo snacks staff)
+]);
 
 const ROOM_RULES_BODY = [
   'REGLAMENTO DE USO DE SALAS DE JUNTAS',
@@ -39,7 +43,7 @@ const ROOM_RULES_BODY = [
   '1. Orden y limpieza',
   '• Configuración original: acomode sillas y mesas como se encontraron.',
   '• Cero basura: llévese envases y envolturas. No deje derrames.',
-  '• Consumo: solo en Sala Maya se permiten snacks; en las demás, únicamente agua.',
+  '• Consumo: se permite comida en Sala Maya y Sala Alebrije; en Sala Cosmovitral, solo snacks para staff; en las demás, únicamente agua.',
   '',
   '2. Cuidado del mobiliario y equipo',
   '• Uso adecuado: evite sentarse en descansabrazos y no raye mesas.',
@@ -49,7 +53,7 @@ const ROOM_RULES_BODY = [
   '3. Gestión de horarios',
   '• Puntualidad de salida: desocupe un par de minutos antes de finalizar.',
   '• Libere si no usa: cancele la reserva de inmediato si no se ocupará.',
-  '• Salas "fantasma": pasados 10 minutos de tolerancia, la sala queda libre.',
+  '• Salas no ocupadas: pasados 10 minutos de tolerancia, la sala queda libre.',
   '',
   '4. Incumplimiento',
   'En caso de daño, desperfecto o mal uso reiterado se aplicarán las medidas del Reglamento Interno de Trabajo.',
@@ -232,6 +236,14 @@ function fold(value) {
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .trim();
+}
+
+function roomHasFoodException(room) {
+  if (!room) return false;
+  const email = (room.email || '').toLowerCase();
+  if (FOOD_ROOM_EMAILS.has(email)) return true;
+  const name = fold(room.name);
+  return name.includes('maya') || name.includes('alebrije') || name.includes('cosmovitral');
 }
 
 function guestEmails() {
@@ -504,7 +516,7 @@ function render() {
   const title = selectedRoom.name.toUpperCase();
   const titleChanged = roomTitle.textContent !== title;
   const prevCount = countNote.textContent;
-  const wasMaya = Boolean(rulesGroup && rulesGroup.classList.contains('is-maya'));
+  const hadFoodException = Boolean(rulesGroup && rulesGroup.classList.contains('is-maya'));
 
   roomTitle.textContent = title;
   roomNote.textContent = `Buzón de la sala: ${selectedRoom.email}`;
@@ -514,12 +526,9 @@ function render() {
   const hasJuntasRules = roomHasJuntasRules();
   if (rulesGroup) {
     rulesGroup.hidden = !hasJuntasRules;
-    const isMaya =
-      hasJuntasRules &&
-      (selectedRoom.email.toLowerCase() === MAYA_EMAIL ||
-        fold(selectedRoom.name).includes('maya'));
-    rulesGroup.classList.toggle('is-maya', isMaya);
-    if (isMaya && !wasMaya && hasRendered) {
+    const hasFoodException = hasJuntasRules && roomHasFoodException(selectedRoom);
+    rulesGroup.classList.toggle('is-maya', hasFoodException);
+    if (hasFoodException && !hadFoodException && hasRendered) {
       const consumo = rulesGroup.querySelector('.rule-consumo');
       if (consumo) replayAnimation(consumo, 'is-highlight');
     }

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="color-scheme" content="light dark" />
-  <meta name="theme-color" content="#10263C" />
+  <meta name="theme-color" content="#07131e" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -12,7 +12,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>Reserva de salas — Complejo Toluca</title>
   <link rel="icon" type="image/png" href="static/gm-logo.png" />
-  <link rel="stylesheet" href="static/styles.css?v=20260904-1153" />
+  <link rel="stylesheet" href="static/styles.css?v=20260907-norail" />
 </head>
 <body>
 
@@ -52,9 +52,14 @@
   <main class="wrap">
 
     <header class="header">
+      <div class="header-ribbon">
+        <span>General Motors de México</span>
+        <span class="ribbon-sep" aria-hidden="true"></span>
+        <span>Herramienta interna de reservas</span>
+      </div>
       <div class="header-brand">
         <div class="logo-plate">
-          <img class="gm-logo" src="static/gm-logo.png" alt="General Motors" width="64" height="64" />
+          <img class="gm-logo" src="static/gm-logo.png" alt="General Motors" width="72" height="72" />
         </div>
         <div class="header-text">
           <p class="eyebrow">General Motors</p>
@@ -77,6 +82,7 @@
       <div class="grid-2">
         <section class="field-group">
           <p class="section-label">
+            <span class="step-num">01</span>
             <svg class="icon" aria-hidden="true"><use href="#i-door" /></svg>
             Sala
           </p>
@@ -97,10 +103,11 @@
       </div>
 
       <section class="field-group">
-        <p class="section-label">
-          <svg class="icon" aria-hidden="true"><use href="#i-user" /></svg>
-          Invitados
-        </p>
+          <p class="section-label">
+            <span class="step-num">02</span>
+            <svg class="icon" aria-hidden="true"><use href="#i-user" /></svg>
+            Invitados
+          </p>
 
         <div class="pill-row" id="pill-row"></div>
 
@@ -164,7 +171,7 @@
       </section>
 
       <div class="actions">
-        <p class="actions-kicker">Confirmar reserva</p>
+        <p class="actions-kicker"><span class="step-num">03</span> Confirmar reserva</p>
         <a class="btn btn-open" id="open-btn" href="#" target="_blank" rel="noopener noreferrer">
           <svg class="icon" aria-hidden="true"><use href="#i-external" /></svg>
           Abrir en Outlook
@@ -195,6 +202,6 @@
 
   </main>
 
-  <script src="static/app.js?v=20260904-1153" defer></script>
+  <script src="static/app.js?v=20260907-norail" defer></script>
 </body>
 </html>

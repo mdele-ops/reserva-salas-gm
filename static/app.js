@@ -190,7 +190,8 @@ function syncRoomUrl(room) {
   if (!window.history || typeof window.history.replaceState !== 'function') return;
   try {
     const url = new URL(window.location.href);
-    if (!isRoomBookable(room)) {
+    const slug = roomSlug(room);
+    if (!slug) {
       if (!url.searchParams.has('sala') && !url.searchParams.has('room')) return;
       url.searchParams.delete('sala');
       url.searchParams.delete('room');
@@ -198,8 +199,6 @@ function syncRoomUrl(room) {
       return;
     }
 
-    const slug = roomSlug(room);
-    if (!slug) return;
     if (url.searchParams.get('sala') === slug && !url.searchParams.has('room')) return;
 
     url.searchParams.set('sala', slug);

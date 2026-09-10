@@ -11,19 +11,33 @@ const OUTLOOK_APP_COMPOSE = 'ms-outlook://events/new';
 
 const RULESET_JUNTAS = 'juntas';
 
+const AREA_ORDER = [
+  'Toluca Manufacturing Building',
+  'Planta Fundición',
+  'Planta Motores',
+];
+
 const config = {
   rooms: [
-    { name: 'Sala Colibrí',  email: 'SRR270201@gm.com', rules: RULESET_JUNTAS },
-    { name: 'Sala Maya',     email: 'SRR271627@gm.com', rules: RULESET_JUNTAS },
-    { name: 'Sala Alebrije', email: 'SRR240332@gm.com', rules: RULESET_JUNTAS },
-    { name: 'Sala Ajolote',  email: 'SRR265183@gm.com', rules: RULESET_JUNTAS },
-    { name: 'Sala Alfeñique', email: 'SRR210381@gm.com', rules: RULESET_JUNTAS },
-    { name: 'Sala Cosmovitral', email: 'SRR295794@gm.com', rules: RULESET_JUNTAS },
-    { name: 'Sala Árbol de la vida', email: 'SRR233942@gm.com', rules: RULESET_JUNTAS },
-    { name: 'Sala Los Portales', email: 'SRR271700@gm.com', rules: RULESET_JUNTAS },
-    { name: 'Sala La Marquesa', email: 'SRR287390@gm.com', rules: RULESET_JUNTAS },
-    { name: 'Sala Tollotzin', email: 'SRR223991@gm.com', rules: RULESET_JUNTAS },
-    { name: 'Sala Xinantecatl', email: 'SRR268423@gm.com', rules: RULESET_JUNTAS },
+    { name: 'Sala Colibrí',  email: 'SRR270201@gm.com', area: 'Toluca Manufacturing Building', rules: RULESET_JUNTAS },
+    { name: 'Sala Maya',     email: 'SRR271627@gm.com', area: 'Toluca Manufacturing Building', rules: RULESET_JUNTAS },
+    { name: 'Sala Alebrije', email: 'SRR240332@gm.com', area: 'Toluca Manufacturing Building', rules: RULESET_JUNTAS },
+    { name: 'Sala Ajolote',  email: 'SRR265183@gm.com', area: 'Toluca Manufacturing Building', rules: RULESET_JUNTAS },
+    { name: 'Sala Alfeñique', email: 'SRR210381@gm.com', area: 'Toluca Manufacturing Building', rules: RULESET_JUNTAS },
+    { name: 'Sala Cosmovitral', email: 'SRR295794@gm.com', area: 'Toluca Manufacturing Building', rules: RULESET_JUNTAS },
+    { name: 'Sala Árbol de la vida', email: 'SRR233942@gm.com', area: 'Toluca Manufacturing Building', rules: RULESET_JUNTAS },
+    { name: 'Sala Los Portales', email: 'SRR271700@gm.com', area: 'Toluca Manufacturing Building', rules: RULESET_JUNTAS },
+    { name: 'Sala La Marquesa', email: 'SRR287390@gm.com', area: 'Toluca Manufacturing Building', rules: RULESET_JUNTAS },
+    { name: 'Sala Tollotzin', email: 'SRR223991@gm.com', area: 'Toluca Manufacturing Building', rules: RULESET_JUNTAS },
+    { name: 'Sala Xinantecatl', email: 'SRR268423@gm.com', area: 'Toluca Manufacturing Building', rules: RULESET_JUNTAS },
+    { name: 'Sala Capulin', email: '', area: 'Planta Fundición', pending: true, rules: RULESET_JUNTAS },
+    { name: 'Sala Tollocan', email: '', area: 'Planta Fundición', pending: true, rules: RULESET_JUNTAS },
+    { name: 'Sala Chichen Itza', email: 'Toluca_NEB_Comm@gm.com', area: 'Planta Motores', rules: RULESET_JUNTAS },
+    { name: 'Sala Tulum', email: 'Toluca_NEB_Recog@gm.com', area: 'Planta Motores', rules: RULESET_JUNTAS },
+    { name: 'Sala Monte Alban', email: 'Toluca_NEB_Fair@gm.com', area: 'Planta Motores', rules: RULESET_JUNTAS },
+    { name: 'Sala Palenque', email: 'Toluca_NEB_Growth@gm.com', area: 'Planta Motores', rules: RULESET_JUNTAS },
+    { name: 'Sala Tajin', email: 'Toluca_NEB_Trust@gm.com', area: 'Planta Motores', rules: RULESET_JUNTAS },
+    { name: 'Sala Teotihuacan', email: 'Toluca_NEB_TeamWork@gm.com', area: 'Planta Motores', rules: RULESET_JUNTAS },
   ],
   allowedDomain: 'gm.com',
   defaultDurationMin: 60,
@@ -31,6 +45,7 @@ const config = {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ROOM_STORAGE_KEY = 'salas.lastRoomEmail';
+const AREA_STORAGE_KEY = 'salas.lastArea';
 const FOOD_ROOM_EMAILS = new Set([
   'srr271627@gm.com', // Maya
   'srr240332@gm.com', // Alebrije
@@ -60,7 +75,8 @@ const ROOM_RULES_BODY = [
 ].join('\n');
 
 let guests = []; // { email, name }
-let selectedRoom = config.rooms[0];
+let selectedRoom = config.rooms.find((room) => room.email) || config.rooms[0];
+let selectedArea = (selectedRoom && selectedRoom.area) || AREA_ORDER[0];
 let lastAddedGuest = null;
 let hasRendered = false;
 let directory = [];
@@ -71,6 +87,8 @@ let activeSuggestion = -1;
 /* ── DOM refs ───────────────────────────────────────── */
 const form         = document.getElementById('booking-form');
 const roomTitle    = document.getElementById('room-title');
+const areaSelect   = document.getElementById('area-select');
+const areaNote     = document.getElementById('area-note');
 const roomSelect   = document.getElementById('room-select');
 const roomNote     = document.getElementById('room-note');
 const subjectInput = document.getElementById('subject-input');
@@ -99,9 +117,29 @@ function replayAnimation(el, className) {
 }
 
 /* ── Salas ──────────────────────────────────────────── */
+function roomArea(room) {
+  return (room && room.area) || AREA_ORDER[0];
+}
+
+function isRoomBookable(room) {
+  return Boolean(room && room.email && !room.pending);
+}
+
+function listAreas() {
+  const found = new Set(config.rooms.map(roomArea));
+  const ordered = AREA_ORDER.filter((area) => found.has(area));
+  const extras = [...found].filter((area) => !AREA_ORDER.includes(area)).sort();
+  return ordered.concat(extras);
+}
+
+function roomsInArea(area) {
+  return config.rooms.filter((room) => roomArea(room) === area);
+}
+
 function findRoom(email) {
   const needle = (email || '').trim().toLowerCase();
-  return config.rooms.find((room) => room.email.toLowerCase() === needle) || null;
+  if (!needle) return null;
+  return config.rooms.find((room) => room.email && room.email.toLowerCase() === needle) || null;
 }
 
 function isRoomEmail(email) {
@@ -149,9 +187,17 @@ function readRoomFromUrl() {
 }
 
 function syncRoomUrl(room) {
-  if (!room || !window.history || typeof window.history.replaceState !== 'function') return;
+  if (!window.history || typeof window.history.replaceState !== 'function') return;
   try {
     const url = new URL(window.location.href);
+    if (!isRoomBookable(room)) {
+      if (!url.searchParams.has('sala') && !url.searchParams.has('room')) return;
+      url.searchParams.delete('sala');
+      url.searchParams.delete('room');
+      window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+      return;
+    }
+
     const slug = roomSlug(room);
     if (!slug) return;
     if (url.searchParams.get('sala') === slug && !url.searchParams.has('room')) return;
@@ -178,6 +224,7 @@ function roomHasJuntasRules(room = selectedRoom) {
 function applyKnownRules() {
   config.rooms.forEach((room) => {
     if (!room.rules) room.rules = RULESET_JUNTAS;
+    if (!room.area) room.area = AREA_ORDER[0];
   });
 }
 
@@ -198,30 +245,150 @@ function storeRoom(email) {
   }
 }
 
-function renderRoomOptions() {
+function readStoredArea() {
+  try {
+    return localStorage.getItem(AREA_STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function storeArea(area) {
+  try {
+    localStorage.setItem(AREA_STORAGE_KEY, area);
+  } catch {
+    // Modo privado o almacenamiento bloqueado: la selección solo dura la sesión.
+  }
+}
+
+function renderAreaOptions() {
+  if (!areaSelect) return;
+
+  const current = selectedArea;
+  areaSelect.replaceChildren();
+  listAreas().forEach((area) => {
+    const option = document.createElement('option');
+    option.value = area;
+    option.textContent = area;
+    areaSelect.appendChild(option);
+  });
+
+  const areas = listAreas();
+  selectedArea = areas.includes(current) ? current : areas[0];
+  areaSelect.value = selectedArea;
+}
+
+function pickRoomForArea(area) {
+  const areaRooms = roomsInArea(area);
+  if (!areaRooms.length) return null;
+
+  const stored = findRoom(readStoredRoom());
+  if (stored && roomArea(stored) === area) return stored;
+  if (selectedRoom && roomArea(selectedRoom) === area) return selectedRoom;
+  return areaRooms.find(isRoomBookable) || areaRooms[0];
+}
+
+function fillRoomSelect(area) {
   roomSelect.replaceChildren();
 
-  config.rooms.forEach((room) => {
+  const areaRooms = roomsInArea(area);
+  areaRooms.forEach((room) => {
     const option = document.createElement('option');
-    option.value = room.email;
-    option.textContent = room.name;
+    const bookable = isRoomBookable(room);
+    option.value = bookable ? room.email : `pending:${roomSlug(room)}`;
+    option.textContent = bookable ? room.name : `${room.name} — Pendiente`;
+    option.dataset.pending = bookable ? '0' : '1';
     roomSelect.appendChild(option);
   });
 
-  selectedRoom =
-    readRoomFromUrl() ||
-    findRoom(readStoredRoom()) ||
-    findRoom(selectedRoom && selectedRoom.email) ||
-    config.rooms[0];
-  roomSelect.value = selectedRoom.email;
+  return areaRooms;
+}
+
+function applyRoomSelection(room) {
+  selectedRoom = room;
+  selectedArea = roomArea(room);
+  if (areaSelect) areaSelect.value = selectedArea;
+
+  if (isRoomBookable(room)) {
+    roomSelect.value = room.email;
+  } else if (room) {
+    roomSelect.value = `pending:${roomSlug(room)}`;
+  }
+}
+
+function renderRoomOptions() {
+  fillRoomSelect(selectedArea);
+
+  const room = pickRoomForArea(selectedArea) || config.rooms.find(isRoomBookable) || config.rooms[0];
+  applyRoomSelection(room);
+}
+
+function resolveInitialSelection() {
+  const fromUrl = readRoomFromUrl();
+  if (fromUrl) {
+    selectedRoom = fromUrl;
+    selectedArea = roomArea(fromUrl);
+    return;
+  }
+
+  const storedRoom = findRoom(readStoredRoom());
+  if (storedRoom) {
+    selectedRoom = storedRoom;
+    selectedArea = roomArea(storedRoom);
+    return;
+  }
+
+  const storedArea = readStoredArea();
+  if (storedArea && listAreas().includes(storedArea)) {
+    selectedArea = storedArea;
+    selectedRoom = pickRoomForArea(storedArea);
+    return;
+  }
+
+  selectedRoom = config.rooms.find(isRoomBookable) || config.rooms[0];
+  selectedArea = roomArea(selectedRoom);
+}
+
+function selectArea(area) {
+  if (!area || !listAreas().includes(area)) return;
+
+  selectedArea = area;
+  storeArea(area);
+
+  fillRoomSelect(area);
+  const room = pickRoomForArea(area);
+  if (!room) return;
+
+  applyRoomSelection(room);
+  if (isRoomBookable(room)) storeRoom(room.email);
+  syncRoomUrl(room);
+  showError('');
+  render();
 }
 
 function selectRoom(email) {
-  const room = findRoom(email);
-  if (!room) return;
+  const raw = String(email || '');
+  if (raw.startsWith('pending:')) {
+    const slug = raw.slice('pending:'.length);
+    const room =
+      roomsInArea(selectedArea).find((item) => roomSlug(item) === slug) ||
+      findRoomBySlug(slug);
+    if (!room) return;
+    applyRoomSelection(room);
+    storeArea(selectedArea);
+    syncRoomUrl(room);
+    showError('');
+    render();
+    return;
+  }
 
-  selectedRoom = room;
+  const room = findRoom(email);
+  if (!room || !isRoomBookable(room)) return;
+
+  applyRoomSelection(room);
+  storeArea(selectedArea);
   storeRoom(room.email);
+  syncRoomUrl(room);
   showError('');
   render();
 }
@@ -480,8 +647,12 @@ function addGuestEmail(rawEmail, name = '') {
     showError(`Solo se permiten correos @${config.allowedDomain}.`);
     return;
   }
-  if (value === selectedRoom.email.toLowerCase()) {
+  if (value === (selectedRoom.email || '').toLowerCase()) {
     showError('La sala ya está incluida en la invitación.');
+    return;
+  }
+  if (!isRoomBookable(selectedRoom)) {
+    showError('Esta sala aún no tiene buzón asignado.');
     return;
   }
   if (isRoomEmail(value)) {
@@ -513,17 +684,33 @@ function removeGuest(email) {
 
 /* ── Render ─────────────────────────────────────────── */
 function render() {
-  const title = selectedRoom.name.toUpperCase();
+  const bookable = isRoomBookable(selectedRoom);
+  const title = selectedRoom
+    ? selectedRoom.name.toUpperCase()
+    : 'RESERVA DE SALAS';
   const titleChanged = roomTitle.textContent !== title;
   const prevCount = countNote.textContent;
   const hadFoodException = Boolean(rulesGroup && rulesGroup.classList.contains('is-maya'));
 
   roomTitle.textContent = title;
-  roomNote.textContent = `Buzón de la sala: ${selectedRoom.email}`;
-  document.title = `Reservar ${selectedRoom.name} — Complejo Toluca`;
+  if (areaNote) {
+    areaNote.textContent = selectedArea
+      ? `Área seleccionada: ${selectedArea}`
+      : '';
+  }
+  if (bookable) {
+    roomNote.textContent = `Buzón de la sala: ${selectedRoom.email}`;
+  } else if (selectedRoom) {
+    roomNote.textContent = 'Buzón pendiente de asignación. Esta sala aún no se puede reservar.';
+  } else {
+    roomNote.textContent = '';
+  }
+  document.title = selectedRoom
+    ? `Reservar ${selectedRoom.name} — Complejo Toluca`
+    : 'Reserva de salas — Complejo Toluca';
   syncRoomUrl(selectedRoom);
 
-  const hasJuntasRules = roomHasJuntasRules();
+  const hasJuntasRules = bookable && roomHasJuntasRules();
   if (rulesGroup) {
     rulesGroup.hidden = !hasJuntasRules;
     const hasFoodException = hasJuntasRules && roomHasFoodException(selectedRoom);
@@ -535,32 +722,51 @@ function render() {
   }
   if (headerSub) {
     headerSub.textContent = hasJuntasRules
-      ? 'Seleccione la sala, invite a los participantes y consulte el reglamento'
-      : 'Seleccione la sala e invite a los participantes';
+      ? 'Seleccione el área, la sala, invite a los participantes y consulte el reglamento'
+      : bookable
+        ? 'Seleccione el área, la sala e invite a los participantes'
+        : 'El buzón de esta sala está pendiente. Elija otra área o sala para reservar.';
   }
   if (outlookHint) {
     outlookHint.textContent = hasJuntasRules
       ? 'En dispositivos móviles se abre la aplicación con el borrador. Fecha y horario se definen ahí. El reglamento se incluye en el cuerpo de la invitación.'
-      : 'En dispositivos móviles se abre la aplicación con el borrador. Fecha y horario se definen ahí.';
+      : bookable
+        ? 'En dispositivos móviles se abre la aplicación con el borrador. Fecha y horario se definen ahí.'
+        : 'Cuando se asigne el buzón de Exchange, esta sala quedará disponible para reservar.';
   }
 
   if (titleChanged && hasRendered) {
     replayAnimation(roomTitle, 'is-swapping');
     replayAnimation(roomNote, 'is-shown');
+    if (areaNote) replayAnimation(areaNote, 'is-shown');
     if (headerSub) replayAnimation(headerSub, 'is-shown');
   }
 
   pillRow.replaceChildren();
-  const roomPill = buildPill(selectedRoom.email, { locked: true });
-  if (titleChanged && hasRendered) roomPill.classList.add('is-new');
-  pillRow.appendChild(roomPill);
+  if (bookable) {
+    const roomPill = buildPill(selectedRoom.email, { locked: true });
+    if (titleChanged && hasRendered) roomPill.classList.add('is-new');
+    pillRow.appendChild(roomPill);
+  }
   guests.forEach((guest) => pillRow.appendChild(buildPill(guest)));
   lastAddedGuest = null;
 
-  const total = guests.length + 1;
-  const nextCount = `${total} destinatario${total === 1 ? '' : 's'} (sala incluida)`;
+  const total = guests.length + (bookable ? 1 : 0);
+  const nextCount = bookable
+    ? `${total} destinatario${total === 1 ? '' : 's'} (sala incluida)`
+    : guests.length
+      ? `${guests.length} invitado${guests.length === 1 ? '' : 's'} (sala pendiente)`
+      : 'Sala pendiente de buzón';
   countNote.textContent = nextCount;
   if (hasRendered && prevCount !== nextCount) replayAnimation(countNote, 'is-shown');
+
+  const canBook = bookable;
+  openBtn.classList.toggle('is-disabled', !canBook);
+  openBtn.setAttribute('aria-disabled', canBook ? 'false' : 'true');
+  if (!canBook) openBtn.removeAttribute('href');
+  copyBtn.disabled = !canBook;
+  addBtn.disabled = !canBook;
+  emailInput.disabled = !canBook;
 
   updateOutlookLink();
   hasRendered = true;
@@ -654,11 +860,14 @@ function isAndroid() {
 }
 
 function meetingPayload() {
+  if (!isRoomBookable(selectedRoom)) return null;
+
   const subject = subjectInput.value.trim() || `Reunión — ${selectedRoom.name}`;
   const body = roomHasJuntasRules() ? ROOM_RULES_BODY : '';
+  const area = roomArea(selectedRoom);
   return {
     subject,
-    location: selectedRoom.name,
+    location: `${area} · ${selectedRoom.name}`,
     attendees: [selectedRoom.email, ...guestEmails()].join(','),
     body,
     bodyHtml: body ? body.replace(/\n/g, '<br>') : '',
@@ -667,6 +876,7 @@ function meetingPayload() {
 
 function buildWebOutlookUrl() {
   const meeting = meetingPayload();
+  if (!meeting) return '';
   const params = new URLSearchParams({
     path: '/calendar/action/compose',
     rru: 'addevent',
@@ -681,6 +891,7 @@ function buildWebOutlookUrl() {
 
 function buildMobileWebOutlookUrl() {
   const meeting = meetingPayload();
+  if (!meeting) return '';
   const params = new URLSearchParams({
     path: 'calendar/action/compose',
     rru: 'addevent',
@@ -701,6 +912,7 @@ function encodeAppQuery(params) {
 
 function buildAppQuery() {
   const meeting = meetingPayload();
+  if (!meeting) return '';
   const params = {
     title: meeting.subject,
     location: meeting.location,
@@ -711,15 +923,19 @@ function buildAppQuery() {
 }
 
 function buildAppOutlookUrl() {
-  return `${OUTLOOK_APP_COMPOSE}?${buildAppQuery()}`;
+  const query = buildAppQuery();
+  return query ? `${OUTLOOK_APP_COMPOSE}?${query}` : '';
 }
 
 function buildAndroidIntentUrl() {
+  const query = buildAppQuery();
+  if (!query) return '';
   const fallback = encodeURIComponent(buildMobileWebOutlookUrl());
-  return `intent://events/new?${buildAppQuery()}#Intent;scheme=ms-outlook;package=com.microsoft.office.outlook;S.browser_fallback_url=${fallback};end`;
+  return `intent://events/new?${query}#Intent;scheme=ms-outlook;package=com.microsoft.office.outlook;S.browser_fallback_url=${fallback};end`;
 }
 
 function buildOutlookUrl() {
+  if (!isRoomBookable(selectedRoom)) return '';
   if (isAndroid()) return buildAndroidIntentUrl();
   if (isPhone()) return buildAppOutlookUrl();
   return buildWebOutlookUrl();
@@ -727,6 +943,14 @@ function buildOutlookUrl() {
 
 function updateOutlookLink() {
   const url = buildOutlookUrl();
+  if (!url) {
+    openBtn.removeAttribute('href');
+    openBtn.setAttribute('aria-disabled', 'true');
+    copyBtn.setAttribute('aria-disabled', 'true');
+    resetCopyLabel();
+    return '';
+  }
+
   openBtn.href = url;
   if (isPhone()) {
     openBtn.removeAttribute('target');
@@ -735,13 +959,18 @@ function updateOutlookLink() {
     openBtn.target = '_blank';
     openBtn.rel = 'noopener noreferrer';
   }
-  openBtn.removeAttribute('aria-disabled');
+  openBtn.setAttribute('aria-disabled', 'false');
   copyBtn.removeAttribute('aria-disabled');
   resetCopyLabel();
   return url;
 }
 
 function openOutlook(event) {
+  if (!isRoomBookable(selectedRoom)) {
+    event.preventDefault();
+    showError('Esta sala aún no tiene buzón asignado.');
+    return;
+  }
   if (!isPhone()) return;
 
   event.preventDefault();
@@ -778,6 +1007,11 @@ function openOutlook(event) {
 }
 
 async function copyLink() {
+  if (!isRoomBookable(selectedRoom)) {
+    showError('Esta sala aún no tiene buzón asignado.');
+    return;
+  }
+
   const url = buildWebOutlookUrl();
   if (!url) return;
 
@@ -815,7 +1049,25 @@ async function loadConfig() {
     Object.assign(config, data);
     applyKnownRules();
 
-    renderRoomOptions();
+    // Mantener el área/sala ya elegidos por el usuario si siguen existiendo.
+    const matchedRoom = config.rooms.find(
+      (room) =>
+        selectedRoom &&
+        room.name === selectedRoom.name &&
+        roomArea(room) === roomArea(selectedRoom) &&
+        (room.email || '') === (selectedRoom.email || '')
+    );
+
+    if (matchedRoom && listAreas().includes(selectedArea)) {
+      selectedRoom = matchedRoom;
+      selectedArea = roomArea(matchedRoom);
+    } else {
+      resolveInitialSelection();
+    }
+
+    renderAreaOptions();
+    fillRoomSelect(selectedArea);
+    applyRoomSelection(selectedRoom || pickRoomForArea(selectedArea));
     emailInput.placeholder = `Nombre o usuario@${config.allowedDomain}`;
   } catch {
     // La página funciona con los valores por defecto si el API no responde.
@@ -825,14 +1077,29 @@ async function loadConfig() {
 /* ── Listeners ──────────────────────────────────────── */
 form.addEventListener('submit', (e) => e.preventDefault());
 
+if (areaSelect) {
+  areaSelect.addEventListener('change', () => selectArea(areaSelect.value));
+}
+
 roomSelect.addEventListener('change', () => selectRoom(roomSelect.value));
 
 window.addEventListener('popstate', () => {
   const room = readRoomFromUrl();
-  if (!room || room.email === selectedRoom.email) return;
-  selectedRoom = room;
-  storeRoom(room.email);
-  roomSelect.value = room.email;
+  if (!room) return;
+  if (
+    selectedRoom &&
+    ((room.email && room.email === selectedRoom.email) ||
+      (!room.email && roomSlug(room) === roomSlug(selectedRoom)))
+  ) {
+    return;
+  }
+
+  applyRoomSelection(room);
+  storeArea(selectedArea);
+  if (isRoomBookable(room)) storeRoom(room.email);
+  renderAreaOptions();
+  fillRoomSelect(selectedArea);
+  applyRoomSelection(room);
   showError('');
   render();
 });
@@ -867,7 +1134,10 @@ if (rulesEl && rulesGroup) {
 
 /* ── Init ───────────────────────────────────────────── */
 applyKnownRules();
-renderRoomOptions();
+resolveInitialSelection();
+renderAreaOptions();
+fillRoomSelect(selectedArea);
+applyRoomSelection(selectedRoom);
 render();
 loadDirectory();
 loadConfig().then(render);

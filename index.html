@@ -12,7 +12,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>Reserva de salas — Complejo Toluca</title>
   <link rel="icon" type="image/png" href="static/gm-logo.png" />
-  <link rel="stylesheet" href="static/styles.css?v=20260907-norail" />
+  <link rel="stylesheet" href="static/styles.css?v=20260909-areas2" />
 </head>
 <body>
 
@@ -83,28 +83,38 @@
         <section class="field-group">
           <p class="section-label">
             <span class="step-num">01</span>
+            <svg class="icon" aria-hidden="true"><use href="#i-pin" /></svg>
+            Área
+          </p>
+          <select class="control" id="area-select" name="area" aria-label="Área del complejo"></select>
+          <p class="hint" id="area-note"></p>
+        </section>
+
+        <section class="field-group">
+          <p class="section-label">
+            <span class="step-num">02</span>
             <svg class="icon" aria-hidden="true"><use href="#i-door" /></svg>
             Sala
           </p>
           <select class="control" id="room-select" name="room" aria-label="Sala a reservar"></select>
           <p class="hint" id="room-note"></p>
         </section>
-
-        <section class="field-group">
-          <p class="section-label">
-            <svg class="icon" aria-hidden="true"><use href="#i-subject" /></svg>
-            Asunto
-          </p>
-          <input class="control" id="subject-input" name="subject" type="text"
-                 placeholder="Reunión de seguimiento" autocomplete="off"
-                 aria-label="Asunto de la reunión" />
-          <p class="hint">Si el campo queda vacío, se utilizará el nombre de la sala.</p>
-        </section>
       </div>
 
       <section class="field-group">
+        <p class="section-label">
+          <svg class="icon" aria-hidden="true"><use href="#i-subject" /></svg>
+          Asunto
+        </p>
+        <input class="control" id="subject-input" name="subject" type="text"
+               placeholder="Reunión de seguimiento" autocomplete="off"
+               aria-label="Asunto de la reunión" />
+        <p class="hint">Si el campo queda vacío, se utilizará el nombre de la sala.</p>
+      </section>
+
+      <section class="field-group">
           <p class="section-label">
-            <span class="step-num">02</span>
+            <span class="step-num">03</span>
             <svg class="icon" aria-hidden="true"><use href="#i-user" /></svg>
             Invitados
           </p>
@@ -171,7 +181,7 @@
       </section>
 
       <div class="actions">
-        <p class="actions-kicker"><span class="step-num">03</span> Confirmar reserva</p>
+        <p class="actions-kicker"><span class="step-num">04</span> Confirmar reserva</p>
         <a class="btn btn-open" id="open-btn" href="#" target="_blank" rel="noopener noreferrer">
           <svg class="icon" aria-hidden="true"><use href="#i-external" /></svg>
           Abrir en Outlook
@@ -202,6 +212,6 @@
 
   </main>
 
-  <script src="static/app.js?v=20260907-norail" defer></script>
+  <script src="static/app.js?v=20260909-areas2" defer></script>
 </body>
 </html>

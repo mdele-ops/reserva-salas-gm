@@ -3,56 +3,117 @@
     {
       "name": "Sala Colibrí",
       "email": "SRR270201@gm.com",
+      "area": "Toluca Manufacturing Building",
       "rules": "juntas"
     },
     {
       "name": "Sala Maya",
       "email": "SRR271627@gm.com",
+      "area": "Toluca Manufacturing Building",
       "rules": "juntas"
     },
     {
       "name": "Sala Alebrije",
       "email": "SRR240332@gm.com",
+      "area": "Toluca Manufacturing Building",
       "rules": "juntas"
     },
     {
       "name": "Sala Ajolote",
       "email": "SRR265183@gm.com",
+      "area": "Toluca Manufacturing Building",
       "rules": "juntas"
     },
     {
       "name": "Sala Alfeñique",
       "email": "SRR210381@gm.com",
+      "area": "Toluca Manufacturing Building",
       "rules": "juntas"
     },
     {
       "name": "Sala Cosmovitral",
       "email": "SRR295794@gm.com",
+      "area": "Toluca Manufacturing Building",
       "rules": "juntas"
     },
     {
       "name": "Sala Árbol de la vida",
       "email": "SRR233942@gm.com",
+      "area": "Toluca Manufacturing Building",
       "rules": "juntas"
     },
     {
       "name": "Sala Los Portales",
       "email": "SRR271700@gm.com",
+      "area": "Toluca Manufacturing Building",
       "rules": "juntas"
     },
     {
       "name": "Sala La Marquesa",
       "email": "SRR287390@gm.com",
+      "area": "Toluca Manufacturing Building",
       "rules": "juntas"
     },
     {
       "name": "Sala Tollotzin",
       "email": "SRR223991@gm.com",
+      "area": "Toluca Manufacturing Building",
       "rules": "juntas"
     },
     {
       "name": "Sala Xinantecatl",
       "email": "SRR268423@gm.com",
+      "area": "Toluca Manufacturing Building",
+      "rules": "juntas"
+    },
+    {
+      "name": "Sala Capulin",
+      "email": "",
+      "area": "Planta Fundición",
+      "pending": true,
+      "rules": "juntas"
+    },
+    {
+      "name": "Sala Tollocan",
+      "email": "",
+      "area": "Planta Fundición",
+      "pending": true,
+      "rules": "juntas"
+    },
+    {
+      "name": "Sala Chichen Itza",
+      "email": "Toluca_NEB_Comm@gm.com",
+      "area": "Planta Motores",
+      "rules": "juntas"
+    },
+    {
+      "name": "Sala Tulum",
+      "email": "Toluca_NEB_Recog@gm.com",
+      "area": "Planta Motores",
+      "rules": "juntas"
+    },
+    {
+      "name": "Sala Monte Alban",
+      "email": "Toluca_NEB_Fair@gm.com",
+      "area": "Planta Motores",
+      "rules": "juntas"
+    },
+    {
+      "name": "Sala Palenque",
+      "email": "Toluca_NEB_Growth@gm.com",
+      "area": "Planta Motores",
+      "rules": "juntas"
+    },
+    {
+      "name": "Sala Tajin",
+      "email": "Toluca_NEB_Trust@gm.com",
+      "area": "Planta Motores",
+      "rules": "juntas"
+    },
+    {
+      "name": "Sala Teotihuacan",
+      "email": "Toluca_NEB_TeamWork@gm.com",
+      "area": "Planta Motores",
       "rules": "juntas"
     }
   ],

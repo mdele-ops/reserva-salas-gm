@@ -1128,6 +1128,16 @@ select.control {
   pointer-events: none;
 }
 
+.btn:disabled,
+.control:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+select.control option:disabled {
+  color: #8a93a0;
+}
+
 /* ─── Feedback ───────────────────────────────────────── */
 .error-msg {
   font-size: 12px;

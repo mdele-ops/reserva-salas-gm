@@ -1,4 +1,4 @@
-{
+﻿{
   "rooms": [
     {
       "name": "Sala Colibrí",
@@ -119,5 +119,5 @@
   ],
   "allowedDomain": "gm.com",
   "defaultDurationMin": 60,
-  "directoryCount": 2511
+  "directoryCount": 2512
 }

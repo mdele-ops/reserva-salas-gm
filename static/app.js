@@ -30,6 +30,8 @@ const config = {
     { name: 'Sala La Marquesa', email: 'SRR287390@gm.com', area: 'Toluca Manufacturing Building', rules: RULESET_JUNTAS },
     { name: 'Sala Tollotzin', email: 'SRR223991@gm.com', area: 'Toluca Manufacturing Building', rules: RULESET_JUNTAS },
     { name: 'Sala Xinantecatl', email: 'SRR268423@gm.com', area: 'Toluca Manufacturing Building', rules: RULESET_JUNTAS },
+    { name: 'Sala Mesa Tlacualli', email: 'SRR226325@gm.com', area: 'Toluca Manufacturing Building', rules: RULESET_JUNTAS },
+    { name: 'Sala Tolzu', email: 'SRR270140@gm.com', area: 'Toluca Manufacturing Building', rules: RULESET_JUNTAS },
     { name: 'Sala Capulin', email: '', area: 'Planta Fundición', pending: true, rules: RULESET_JUNTAS },
     { name: 'Sala Tollocan', email: '', area: 'Planta Fundición', pending: true, rules: RULESET_JUNTAS },
     { name: 'Sala Chichen Itza', email: 'Toluca_NEB_Comm@gm.com', area: 'Planta Motores', rules: RULESET_JUNTAS },

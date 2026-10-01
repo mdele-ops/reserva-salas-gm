@@ -5,6 +5,8 @@
    teléfono se abre la app de Outlook con el borrador.
    ───────────────────────────────────────────────────── */
 
+const APP_VERSION = '20261001-salas';
+
 const OUTLOOK_WEB_COMPOSE = 'https://outlook.office.com/calendar/action/compose';
 const OUTLOOK_MOBILE_WEB = 'https://outlook.cloud.microsoft/owa';
 const OUTLOOK_APP_COMPOSE = 'ms-outlook://events/new';
@@ -439,7 +441,7 @@ async function fetchFirstJson(paths) {
 async function loadDirectory() {
   if (directoryPromise) return directoryPromise;
 
-  directoryPromise = fetchFirstJson(['/api/directory', 'directory.json'])
+  directoryPromise = fetchFirstJson(['/api/directory', `directory.json?v=${APP_VERSION}`])
     .then((data) => {
       directory = data && Array.isArray(data.people) ? data.people : [];
       return directory;
@@ -1044,7 +1046,7 @@ function resetCopyLabel() {
 /* ── Configuración del servidor ─────────────────────── */
 async function loadConfig() {
   try {
-    const data = await fetchFirstJson(['/api/config', 'config.json']);
+    const data = await fetchFirstJson(['/api/config', `config.json?v=${APP_VERSION}`]);
     if (!data) return;
     if (!Array.isArray(data.rooms) || data.rooms.length === 0) delete data.rooms;
     Object.assign(config, data);
